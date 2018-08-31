@@ -16,7 +16,6 @@ def send_welcome(message):
     bot.send_message(chat_id=message.chat.id, text='Test message', reply_markup=types.ReplyKeyboardRemove())
 
 
-
 @bot.message_handler(commands=['timetable'])
 def chose_course(message):
     markup = types.ReplyKeyboardMarkup()
@@ -64,7 +63,19 @@ def check_user_id(message):
 
 @bot.message_handler(content_types=['text'])
 def send_timetable(message):
-    bot.send_message(chat_id=message.chat.id, text='Фича в разработке', reply_markup=types.ReplyKeyboardRemove())
+    group = database.db.get_users_group(message.chat.id)
+    text_timetable = 'Фича в разработке'
+    if message.text == 'Понедельник':
+        text_timetable = utils.get_timetable(group, 0)
+    if message.text == 'Вторник':
+        text_timetable = utils.get_timetable(group, 1)
+    if message.text == 'Среда':
+        text_timetable = utils.get_timetable(group, 2)
+    if message.text == 'Четверг':
+        text_timetable = utils.get_timetable(group, 3)
+    if message.text == 'Пятница':
+        text_timetable = utils.get_timetable(group, 4)
+    bot.send_message(chat_id=message.chat.id, text=text_timetable, reply_markup=types.ReplyKeyboardRemove())
 
 # while True:
 #     try:
