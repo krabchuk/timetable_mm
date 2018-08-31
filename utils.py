@@ -4,6 +4,7 @@ timetable_xls = pd.ExcelFile('osen_2018.xls')
 timetable_data11 = timetable_xls.parse('1.1')
 timetable_data12 = timetable_xls.parse('1.2')
 timetable_data13 = timetable_xls.parse('1.3')
+timetable_data52 = timetable_xls.parse('5.2')
 
 
 def group_valid(group):
@@ -35,6 +36,8 @@ def get_para_name(group, day, para_num):
     data = get_data_for_group(group)
     row = day * 15 + para_num * 3
     para_name = ''
+    if data is None:
+        return para_name
     if not isNan(data[row]):
         para_name += str(data[row]) + ' '
     if not isNan(data[row + 1]):
