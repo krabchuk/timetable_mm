@@ -4,6 +4,7 @@ from telebot import types
 import tokens
 import database
 import time
+import utils
 
 
 bot = telebot.TeleBot(tokens.token, threaded=False)
@@ -40,9 +41,16 @@ def add_group_begin(message):
 
 @bot.message_handler(func=lambda message: database.add_user_db.exist(message.chat.id))
 def add_group_end(message):
+    if not str(message.text).isdigit():
+        bot.send_message(chat_id=message.chat.id, text='Номер группы внезапно является числом, попробуй ещё раз')
+        return
+    group = int(message.text)
+    if not utils.group_valid(group):
+        bot.send_message(chat_id=message.chat.id, text='Такой группы не существует, попробуй ещё раз')
+        return
     database.add_user_db.rm_id(message.chat.id)
     database.db.add_user(message.chat.id, int(message.text))
-    bot.send_message(chat_id=message.chat.id, text='Номер {} добавлен'.format(int(message.text)))
+    bot.send_message(chat_id=message.chat.id, text='Теперь номер твоей группы {}'.format(int(message.text)))
 
 
 @bot.message_handler(commands=['check'])
@@ -52,6 +60,7 @@ def check_user_id(message):
         bot.send_message(chat_id=message.chat.id, text='Ваша основная группа {}'.format(group))
     else:
         bot.send_message(chat_id=message.chat.id, text='Вы ещё не зарегистрировались. Отправьте команду /start')
+
 
 @bot.message_handler(content_types=['text'])
 def send_timetable(message):
