@@ -6,6 +6,8 @@ insert_sql = """INSERT INTO users VALUES (?,?)"""
 
 get_data_by_id_sql = """SELECT * FROM users WHERE id=?"""
 
+delete_by_id_sql = """DELETE FROM users WHERE id=?"""
+
 db_file = "./databases/database_users"
 
 
@@ -19,6 +21,7 @@ class DataStorage:
 
     def add_user(self, user_id, user_group):
         c = self.db.cursor()
+        c.execute(delete_by_id_sql, (user_id,))
         c.execute(insert_sql, (user_id, user_group))
 
     def user_exist(self, user_id):
@@ -37,7 +40,7 @@ class DataStorage:
             return 0
         else:
             data = c.fetchall()
-            return data[0].group_num
+            return data[0][1]
 
 
 class SmallStorage:
@@ -58,4 +61,4 @@ class SmallStorage:
 
 
 db = DataStorage(db_file, table_sql)
-small_db = SmallStorage()
+add_user_db = SmallStorage()

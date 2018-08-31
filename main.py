@@ -16,29 +16,31 @@ def send_welcome(message):
 
 
 
-@bot.message_handler(commands=['chose_course'])
+@bot.message_handler(commands=['timetable'])
 def chose_course(message):
     markup = types.ReplyKeyboardMarkup()
-    btn1 = types.KeyboardButton('1 курс')
-    btn2 = types.KeyboardButton('2 курс')
-    btn3 = types.KeyboardButton('3 курс')
-    btn4 = types.KeyboardButton('4 курс')
-    btn5 = types.KeyboardButton('5 курс')
-    btn6 = types.KeyboardButton('6 курс')
-    markup.add(btn1, btn2, btn3,
-               btn4, btn5, btn6)
-    bot.send_message(chat_id=message.chat.id, text='Выбери свой курс:', reply_markup=markup)
+    btn1 = types.KeyboardButton('Сегодня')
+    btn2 = types.KeyboardButton('Понедельник')
+    btn3 = types.KeyboardButton('Вторник')
+    btn4 = types.KeyboardButton('Среда')
+    btn5 = types.KeyboardButton('Четверг')
+    btn6 = types.KeyboardButton('Пятница')
+    btn7 = types.KeyboardButton('Суббота')
+    markup.row(btn1)
+    markup.row(btn2, btn3, btn4)
+    markup.row(btn5, btn6, btn7)
+    bot.send_message(chat_id=message.chat.id, text='Выбери день недели:', reply_markup=markup)
 
 
 @bot.message_handler(commands=['start'])
 def add_group_begin(message):
-    database.small_db.add_id(message.chat.id)
-    bot.send_message(chat_id=message.chat.id, text='Отправь номер группы:')
+    database.add_user_db.add_id(message.chat.id)
+    bot.send_message(chat_id=message.chat.id, text='Отправьте номер группы:')
 
 
-@bot.message_handler(func=lambda message: database.small_db.exist(message.chat.id))
+@bot.message_handler(func=lambda message: database.add_user_db.exist(message.chat.id))
 def add_group_end(message):
-    database.small_db.rm_id(message.chat.id)
+    database.add_user_db.rm_id(message.chat.id)
     database.db.add_user(message.chat.id, int(message.text))
     bot.send_message(chat_id=message.chat.id, text='Номер {} добавлен'.format(int(message.text)))
 
@@ -46,9 +48,14 @@ def add_group_end(message):
 @bot.message_handler(commands=['check'])
 def check_user_id(message):
     if database.db.user_exist(message.chat.id):
-        bot.send_message(chat_id=message.chat.id, text='Вы зарегистрированны')
+        group = database.db.get_users_group(message.chat.id)
+        bot.send_message(chat_id=message.chat.id, text='Ваша основная группа {}'.format(group))
     else:
         bot.send_message(chat_id=message.chat.id, text='Вы ещё не зарегистрировались. Отправьте команду /start')
+
+@bot.message_handler(content_types=['text'])
+def send_timetable(message):
+    bot.send_message(chat_id=message.chat.id, text='Фича в разработке', reply_markup=types.ReplyKeyboardRemove())
 
 # while True:
 #     try:
