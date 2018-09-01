@@ -63,6 +63,11 @@ def check_user_id(message):
 
 @bot.message_handler(content_types=['text'])
 def send_timetable(message):
+    if not database.db.user_exist(message.chat.id):
+        bot.send_message(chat_id=message.chat.id,
+                         text='Вы ещё не зарегистрировались. Отправьте команду /start',
+                         reply_markup=types.ReplyKeyboardRemove())
+        return
     group = database.db.get_users_group(message.chat.id)
     text_timetable = 'Фича в разработке'
     if message.text == 'Понедельник':
