@@ -2,5 +2,6 @@ File to specify commands for BotFather
 
 start - Choose your group
 timetable - Get timetable for your group
+today - Get timetable for today
 check - Get your current group
 info - Get this bot info
