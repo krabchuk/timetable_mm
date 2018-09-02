@@ -9,6 +9,13 @@ import utils
 bot = telebot.TeleBot(tokens.token, threaded=False)
 apihelper.proxy = {'https': 'socks5://' + str(tokens.proxy)}
 
+@bot.message_handler(commands=['info'])
+def send_info(message):
+    info_text = """Timetable MM bot: v1.0
+
+Отзывы, пожелания по работе бота, баги и несоответствия в расписании присылайте на @krabchuk"""
+    bot.send_message(chat_id=message.chat.id, text=info_text)
+
 
 @bot.message_handler(commands=['help'])
 def send_welcome(message):
