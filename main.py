@@ -96,6 +96,8 @@ def send_timetable(message):
     group = database.db.get_users_group(message.chat.id)
     # сдвигаем неделю, чтобы 0 отвечал за верхнюю
     week = (date.today().isocalendar()[1] + 1) % 2
+    if date.today().weekday() == 6:
+        week = (week + 1) % 2
     text_timetable = 'Фича в разработке'
     if message.text == 'Сегодня':
         day = date.today().weekday()
