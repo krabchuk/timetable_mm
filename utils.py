@@ -114,7 +114,7 @@ def get_para_name(group, day, para_num, week):
     if not isNan(data[row + 2]):
         para_name += '└ 🏫' + str(data[row + 2])
     if len(para_name) == 0:
-        para_name = ' └ 😴🌭🎮'
+        para_name = '└ 😴🌭🎮'
     return para_name
 
 
