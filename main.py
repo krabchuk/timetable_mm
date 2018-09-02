@@ -31,6 +31,7 @@ def send_today(message):
 @bot.message_handler(commands=['info'])
 def send_info(message):
     info_text = """Timetable MM bot: v1.0
+    Благодарность Кириллу Сапунову за помощь в парсинге расписания.
 
 Отзывы, пожелания по работе бота, баги и несоответствия в расписании присылайте на @krabchuk"""
     bot.send_message(chat_id=message.chat.id, text=info_text)
