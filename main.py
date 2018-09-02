@@ -4,6 +4,7 @@ from telebot import types
 import tokens
 import database
 from datetime import date
+import time
 import utils
 
 bot = telebot.TeleBot(tokens.token, threaded=False)
@@ -121,11 +122,10 @@ def send_timetable(message):
     bot.send_message(chat_id=message.chat.id, text=text_timetable, reply_markup=types.ReplyKeyboardRemove())
 
 
-# while True:
-#     try:
-#         bot.polling(none_stop=True)
-#     except Exception:
-#         print('Connection error, restart in 1 sec')
-#         time.sleep(1)
+while True:
+    try:
+        bot.polling(none_stop=True)
+    except Exception:
+        print('Connection error, restart in 1 sec')
+        time.sleep(1)
 
-bot.polling(none_stop=True)
