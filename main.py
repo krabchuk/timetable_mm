@@ -9,6 +9,25 @@ import utils
 bot = telebot.TeleBot(tokens.token, threaded=False)
 apihelper.proxy = {'https': 'socks5://' + str(tokens.proxy)}
 
+
+@bot.message_handler(commands=['today'])
+def send_today(message):
+    if not database.db.user_exist(message.chat.id):
+        bot.send_message(chat_id=message.chat.id,
+                         text='Вы ещё не зарегистрировались. Отправьте команду /start',
+                         reply_markup=types.ReplyKeyboardRemove())
+        return
+    group = database.db.get_users_group(message.chat.id)
+    # сдвигаем неделю, чтобы 0 отвечал за верхнюю
+    week = (date.today().isocalendar()[1] + 1) % 2
+    day = date.today().weekday()
+    if day == 6:
+        text_timetable = 'Сегодня воскресенье, какие пары?'
+    else:
+        text_timetable = utils.get_timetable(group, day, week)
+    bot.send_message(chat_id=message.chat.id, text=text_timetable, reply_markup=types.ReplyKeyboardRemove())
+
+
 @bot.message_handler(commands=['info'])
 def send_info(message):
     info_text = """Timetable MM bot: v1.0
@@ -94,6 +113,8 @@ def send_timetable(message):
         text_timetable = utils.get_timetable(group, 3, week)
     if message.text == 'Пятница':
         text_timetable = utils.get_timetable(group, 4, week)
+    if message.text == 'Суббота':
+        text_timetable = utils.get_timetable(group, 5, week)
     bot.send_message(chat_id=message.chat.id, text=text_timetable, reply_markup=types.ReplyKeyboardRemove())
 
 
