@@ -104,12 +104,17 @@ def get_para_name(group, day, para_num, week):
     para_name = ''
     if data is None:
         return para_name
+    if str(data[row]) == 'Физическое воспитание':
+        para_name = '└ 🏃Физическое воспитание'
+        return para_name
     if not isNan(data[row]):
-        para_name += str(data[row]) + ' '
+        para_name += '└ 📚' + str(data[row]) + '\n'
     if not isNan(data[row + 1]):
-        para_name += str(data[row + 1]) + ' '
+        para_name += '└ 👨‍🏫' + str(data[row + 1]) + '\n'
     if not isNan(data[row + 2]):
-        para_name += str(data[row + 2]) + ' '
+        para_name += '└ 🏫' + str(data[row + 2])
+    if len(para_name) == 0:
+        para_name = '└😴🌭🎮'
     return para_name
 
 
@@ -129,7 +134,7 @@ def get_para_time(para_num):
 def get_timetable(group, day, week):
     text = ''
     for para_num in range(5):
-        text += '{} пара {}: '.format(para_num + 1, get_para_time(para_num))
-        text += get_para_name(group, day, para_num, week)
+        text += '{} пара\n└ ⏰ {}\n'.format(para_num + 1, get_para_time(para_num))
+        text +=  get_para_name(group, day, para_num, week)
         text += '\n\n'
     return text
