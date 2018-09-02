@@ -3,9 +3,8 @@ from telebot import apihelper
 from telebot import types
 import tokens
 import database
-import time
+from datetime import date
 import utils
-
 
 bot = telebot.TeleBot(tokens.token, threaded=False)
 apihelper.proxy = {'https': 'socks5://' + str(tokens.proxy)}
@@ -69,18 +68,27 @@ def send_timetable(message):
                          reply_markup=types.ReplyKeyboardRemove())
         return
     group = database.db.get_users_group(message.chat.id)
+    # сдвигаем неделю, чтобы 0 отвечал за верхнюю
+    week = (date.today().isocalendar()[1] + 1) % 2
     text_timetable = 'Фича в разработке'
+    if message.text == 'Сегодня':
+        day = date.today().weekday()
+        if day == 6:
+            text_timetable = 'Сегодня воскресенье, какие пары?'
+        else:
+            text_timetable = utils.get_timetable(group, day, week)
     if message.text == 'Понедельник':
-        text_timetable = utils.get_timetable(group, 0)
+        text_timetable = utils.get_timetable(group, 0, week)
     if message.text == 'Вторник':
-        text_timetable = utils.get_timetable(group, 1)
+        text_timetable = utils.get_timetable(group, 1, week)
     if message.text == 'Среда':
-        text_timetable = utils.get_timetable(group, 2)
+        text_timetable = utils.get_timetable(group, 2, week)
     if message.text == 'Четверг':
-        text_timetable = utils.get_timetable(group, 3)
+        text_timetable = utils.get_timetable(group, 3, week)
     if message.text == 'Пятница':
-        text_timetable = utils.get_timetable(group, 4)
+        text_timetable = utils.get_timetable(group, 4, week)
     bot.send_message(chat_id=message.chat.id, text=text_timetable, reply_markup=types.ReplyKeyboardRemove())
+
 
 # while True:
 #     try:

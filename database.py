@@ -1,14 +1,14 @@
 import sqlite3
 
-table_sql = """CREATE TABLE IF NOT EXISTS users (id integer, group_num integer)"""
+table_sql = 'CREATE TABLE IF NOT EXISTS users (id integer, group_num integer)'
 
-insert_sql = """INSERT INTO users VALUES (?,?)"""
+insert_sql = 'INSERT INTO users VALUES (?,?)'
 
-get_data_by_id_sql = """SELECT * FROM users WHERE id=?"""
+get_data_by_id_sql = 'SELECT * FROM users WHERE id=?'
 
-delete_by_id_sql = """DELETE FROM users WHERE id=?"""
+delete_by_id_sql = 'DELETE FROM users WHERE id=?'
 
-db_file = "./databases/database_users"
+db_file = './database_users'
 
 
 class DataStorage:

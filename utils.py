@@ -80,22 +80,26 @@ def isNan(x):
     return x != x
 
 
-def get_data_for_group(group):
+def get_data_for_group(group, week):
     course = group // 100
     h = 100 * course
     course -= 1
+    if week == 0:
+        timetable_data = timetable_data_up
+    else:
+        timetable_data = timetable_data_down
     if h < group < h + 7:
-        return timetable_data_up[course][0][group]
+        return timetable_data[course][0][group]
     if h + 6 < group < h + 13:
-        return timetable_data_up[course][1][group]
+        return timetable_data[course][1][group]
     if h + 20 < group < h + 27:
-        return timetable_data_up[course][2][group]
+        return timetable_data[course][2][group]
     if h + 30 < group < h + 34:
-        return timetable_data_up[course][3][group]
+        return timetable_data[course][3][group]
 
 
-def get_para_name(group, day, para_num):
-    data = get_data_for_group(group)
+def get_para_name(group, day, para_num, week):
+    data = get_data_for_group(group, week)
     row = day * 15 + para_num * 3
     para_name = ''
     if data is None:
@@ -122,10 +126,10 @@ def get_para_time(para_num):
         return '16:45-18:20'
 
 
-def get_timetable(group, day):
+def get_timetable(group, day, week):
     text = ''
     for para_num in range(5):
         text += '{} пара {}: '.format(para_num + 1, get_para_time(para_num))
-        text += get_para_name(group, day, para_num)
+        text += get_para_name(group, day, para_num, week)
         text += '\n\n'
     return text
