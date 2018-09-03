@@ -63,6 +63,8 @@ timetable_data_down = [[timetable_data11_down, timetable_data12_down, timetable_
                        [timetable_data51_down, timetable_data52_down, timetable_data53_down, timetable_data54_down],
                        [timetable_data61_down, timetable_data62_down, timetable_data63_down, timetable_data64_down]]
 
+get_log = [0]
+
 
 def group_valid(group):
     if 100 < group < 113 or 120 < group < 127 or \
@@ -136,8 +138,10 @@ def get_para_time(para_num, group):
         return '16:45-18:20'
 
 
-
 def get_timetable(group, day, week):
+    get_log[0] += 1
+    if get_log[0] % 100 == 0:
+        print(get_log[0])
     text = ''
     for para_num in range(5):
         text += '{} пара\n└ ⏰ {}\n'.format(para_num + 1, get_para_time(para_num, group))
