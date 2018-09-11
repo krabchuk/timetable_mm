@@ -82,7 +82,7 @@ def group_valid(group):
         return False
 
 
-def isNan(x):
+def is_nan(x):
     return x != x
 
 
@@ -139,11 +139,11 @@ def get_para_name(group, day, para_num, week):
     if str(data[row]) == 'Физическое воспитание':
         para_name = '└ 🏃 Физическое воспитание'
         return para_name
-    if not isNan(data[row]):
+    if not is_nan(data[row]):
         para_name += '└ 📚 ' + str(data[row]) + '\n'
-    if not isNan(data[row + 1]):
+    if not is_nan(data[row + 1]):
         para_name += '└ 👨‍🏫 ' + str(data[row + 1]) + '\n'
-    if not isNan(data[row + 2]):
+    if not is_nan(data[row + 2]):
         para_name += '└ 🏫 ' + str(data[row + 2])
     if len(para_name) == 0:
         para_name = '└ 😴🌭🎮'
