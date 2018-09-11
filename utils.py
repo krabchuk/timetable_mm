@@ -18,8 +18,23 @@ class TimetableData:
             for branch in range(1, 3 + (course > 2) + 1):
                 self.timetable_data[course][branch] = self.xls_file.parse('{}.{}'.format(course, branch))
 
-    def __getitem__(self, item):
-        return self.timetable_data[item]
+    @staticmethod
+    def group_branch(group):
+        group = int(str(group)[1:])
+        if 0 < group < 7:
+            return 1
+        if 6 < group < 13:
+            return 2
+        if 20 < group < 27:
+            return 3
+        if 30 < group < 34:
+            return 4
+        return None
+
+    def group_data(self, group):
+        course = group // 100
+        branch = self.group_branch(group)
+        return self.timetable_data[course][branch][group]
 
 
 timetable_up = TimetableData('osen_2018_up.xls')
@@ -71,19 +86,8 @@ def text_to_weekday(text):
 
 
 def get_data_for_group(group, week):
-    course = group // 100
-    h = 100 * course
-
     timetable_data = timetable_up if week == 0 else timetable_down
-
-    if h < group < h + 7:
-        return timetable_data[course][0][group]
-    if h + 6 < group < h + 13:
-        return timetable_data[course][1][group]
-    if h + 20 < group < h + 27:
-        return timetable_data[course][2][group]
-    if h + 30 < group < h + 34:
-        return timetable_data[course][3][group]
+    return timetable_data.group_data(group)
 
 
 def get_para_name(group, day, para_num, week):
