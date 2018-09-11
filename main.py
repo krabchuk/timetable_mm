@@ -13,12 +13,8 @@ apihelper.proxy = {'https': 'socks5://' + str(tokens.proxy)}
 
 
 @bot.message_handler(commands=['today'])
+@utils.check_user_exist(database.db)
 def send_today(message):
-    if not database.db.user_exist(message.chat.id):
-        bot.send_message(chat_id=message.chat.id,
-                         text='Вы ещё не зарегистрировались. Отправьте команду /start',
-                         reply_markup=types.ReplyKeyboardRemove())
-        return
     group = database.db.get_users_group(message.chat.id)
     # сдвигаем неделю, чтобы 0 отвечал за верхнюю
     week = (date.today().isocalendar()[1] + 1) % 2
@@ -83,27 +79,21 @@ def add_group_end(message):
 
 
 @bot.message_handler(commands=['check'])
+@utils.check_user_exist(database.db)
 def check_user_id(message):
-    if database.db.user_exist(message.chat.id):
-        group = database.db.get_users_group(message.chat.id)
-        bot.send_message(chat_id=message.chat.id, text='Ваша основная группа {}'.format(group))
-    else:
-        bot.send_message(chat_id=message.chat.id, text='Вы ещё не зарегистрировались. Отправьте команду /start')
+    group = database.db.get_users_group(message.chat.id)
+    bot.send_message(chat_id=message.chat.id, text='Ваша основная группа {}'.format(group))
 
 
 @bot.message_handler(content_types=['text'])
+@utils.check_user_exist(database.db)
 def send_timetable(message):
-    if not database.db.user_exist(message.chat.id):
-        bot.send_message(chat_id=message.chat.id,
-                         text='Вы ещё не зарегистрировались. Отправьте команду /start')
-        return
-
-    group = database.db.get_users_group(message.chat.id)
-
     # Сдвигаем неделю, чтобы 0 отвечал за верхнюю
     week = (date.today().isocalendar()[1] + 1) % 2
     if date.today().weekday() == 6:
         week = (week + 1) % 2
+
+    group = database.db.get_users_group(message.chat.id)
 
     if message.text.lower() == 'сегодня':
         day = date.today().weekday()

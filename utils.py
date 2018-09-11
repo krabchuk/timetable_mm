@@ -1,4 +1,8 @@
+import functools
+
 import pandas as pd
+
+from main import bot
 
 timetable_xls_up = pd.ExcelFile('osen_2018_up.xls')
 
@@ -174,3 +178,19 @@ def get_timetable(group, day, week):
         text += get_para_name(group, day, para_num, week)
         text += '\n\n'
     return text
+
+
+def check_user_exist(storage):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapped(message):
+            if not storage.user_exist(message.chat.id):
+                bot.send_message(chat_id=message.chat.id,
+                                 text='✨ Вас нет в базе данных, нажмите /start для регистрации')
+                return
+
+            return func(message)
+
+        return wrapped
+
+    return decorator
