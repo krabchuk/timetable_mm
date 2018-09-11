@@ -27,7 +27,7 @@ def send_today(message):
         text_timetable = 'Сегодня воскресенье, какие пары?'
     else:
         text_timetable = utils.get_timetable(group, day, week)
-    bot.send_message(chat_id=message.chat.id, text=text_timetable, reply_markup=types.ReplyKeyboardRemove())
+    bot.send_message(chat_id=message.chat.id, text=text_timetable)
 
 
 @bot.message_handler(commands=['info'])
@@ -43,12 +43,12 @@ def send_info(message):
 
 @bot.message_handler(commands=['help'])
 def send_welcome(message):
-    bot.send_message(chat_id=message.chat.id, text='Test message', reply_markup=types.ReplyKeyboardRemove())
+    bot.send_message(chat_id=message.chat.id, text='Test message')
 
 
 @bot.message_handler(commands=['timetable'])
 def chose_course(message):
-    markup = types.ReplyKeyboardMarkup()
+    markup = types.ReplyKeyboardMarkup(one_time_keyboard=True)
     btn1 = types.KeyboardButton('Сегодня')
     btn2 = types.KeyboardButton('Понедельник')
     btn3 = types.KeyboardButton('Вторник')
@@ -95,8 +95,7 @@ def check_user_id(message):
 def send_timetable(message):
     if not database.db.user_exist(message.chat.id):
         bot.send_message(chat_id=message.chat.id,
-                         text='Вы ещё не зарегистрировались. Отправьте команду /start',
-                         reply_markup=types.ReplyKeyboardRemove())
+                         text='Вы ещё не зарегистрировались. Отправьте команду /start')
         return
     group = database.db.get_users_group(message.chat.id)
     # сдвигаем неделю, чтобы 0 отвечал за верхнюю
@@ -122,7 +121,7 @@ def send_timetable(message):
         text_timetable = utils.get_timetable(group, 4, week)
     if message.text == 'Суббота':
         text_timetable = utils.get_timetable(group, 5, week)
-    bot.send_message(chat_id=message.chat.id, text=text_timetable, reply_markup=types.ReplyKeyboardRemove())
+    bot.send_message(chat_id=message.chat.id, text=text_timetable)
 
 
 while True:
