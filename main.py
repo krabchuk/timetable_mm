@@ -1,10 +1,11 @@
-import telebot
-from telebot import apihelper
-from telebot import types
-import tokens
-import database
-from datetime import date
 import time
+from datetime import date
+
+import telebot
+from telebot import apihelper, types
+
+import database
+import tokens
 import utils
 
 bot = telebot.TeleBot(tokens.token, threaded=False)
@@ -130,4 +131,3 @@ while True:
     except Exception:
         print('Connection error, restart in 1 sec')
         time.sleep(1)
-

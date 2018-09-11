@@ -145,6 +145,6 @@ def get_timetable(group, day, week):
     text = ''
     for para_num in range(5):
         text += '{} пара\n└ ⏰ {}\n'.format(para_num + 1, get_para_time(para_num, group))
-        text +=  get_para_name(group, day, para_num, week)
+        text += get_para_name(group, day, para_num, week)
         text += '\n\n'
     return text
