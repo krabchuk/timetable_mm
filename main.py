@@ -97,31 +97,22 @@ def send_timetable(message):
         bot.send_message(chat_id=message.chat.id,
                          text='Вы ещё не зарегистрировались. Отправьте команду /start')
         return
+
     group = database.db.get_users_group(message.chat.id)
-    # сдвигаем неделю, чтобы 0 отвечал за верхнюю
+
+    # Сдвигаем неделю, чтобы 0 отвечал за верхнюю
     week = (date.today().isocalendar()[1] + 1) % 2
     if date.today().weekday() == 6:
         week = (week + 1) % 2
-    text_timetable = 'Фича в разработке'
-    if message.text == 'Сегодня':
+
+    if message.text.lower() == 'сегодня':
         day = date.today().weekday()
-        if day == 6:
-            text_timetable = 'Сегодня воскресенье, какие пары?'
-        else:
-            text_timetable = utils.get_timetable(group, day, week)
-    if message.text == 'Понедельник':
-        text_timetable = utils.get_timetable(group, 0, week)
-    if message.text == 'Вторник':
-        text_timetable = utils.get_timetable(group, 1, week)
-    if message.text == 'Среда':
-        text_timetable = utils.get_timetable(group, 2, week)
-    if message.text == 'Четверг':
-        text_timetable = utils.get_timetable(group, 3, week)
-    if message.text == 'Пятница':
-        text_timetable = utils.get_timetable(group, 4, week)
-    if message.text == 'Суббота':
-        text_timetable = utils.get_timetable(group, 5, week)
-    bot.send_message(chat_id=message.chat.id, text=text_timetable)
+        text_timetable = utils.get_timetable(group, day, week) if day != 6 else 'Сегодня воскресенье, какие пары?'
+    else:
+        day = utils.text_to_weekday(message.text)
+        text_timetable = utils.get_timetable(group, day, week) if day else 'Фича в разработке'
+
+    bot.send_message(chat_id=message.chat.id, text=text_timetable, parse_mode='HTML')
 
 
 while True:

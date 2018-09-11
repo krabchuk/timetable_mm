@@ -90,6 +90,24 @@ def code(text, html=True):
     return '<code>{}</code>'.format(text) if html else'`{}`'.format(text)
 
 
+def text_to_weekday(text):
+    if text.lower() in ['понедельник', 'пн']:
+        return 0
+    if text.lower() in ['вторник', 'вт']:
+        return 1
+    if text.lower() in ['среда', 'ср']:
+        return 2
+    if text.lower() in ['четверг', 'чт']:
+        return 3
+    if text.lower() in ['пятница', 'пт']:
+        return 4
+    if text.lower() in ['суббота', 'сб']:
+        return 5
+    if text.lower() in ['воскресенье', 'вс']:
+        return 6
+    return None
+
+
 def get_data_for_group(group, week):
     course = group // 100
     h = 100 * course
