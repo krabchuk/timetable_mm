@@ -123,19 +123,19 @@ def get_para_name(group, day, para_num, week):
 def get_para_time(para_num, group):
     course = group // 100
     if para_num == 0:
-        return '9:00-10:35'
+        return '09:00 — 10:35'
     if para_num == 1:
-        return '10:45-12:20'
+        return '10:45 — 12:20'
     if course < 3:
         if para_num == 2:
-            return '13:15-14:50'
+            return '13:15 — 14:50'
     else:
         if para_num == 2:
-            return '12:30-14:05'
+            return '12:30 — 14:05'
     if para_num == 3:
-        return '15:00-16:35'
+        return '15:00 — 16:35'
     if para_num == 4:
-        return '16:45-18:20'
+        return '16:45 — 18:20'
 
 
 def get_timetable(group, day, week):
