@@ -82,6 +82,14 @@ def isNan(x):
     return x != x
 
 
+def bold(text, html=True):
+    return '<b>{}</b>'.format(text) if html else '*{}*'.format(text)
+
+
+def code(text, html=True):
+    return '<code>{}</code>'.format(text) if html else'`{}`'.format(text)
+
+
 def get_data_for_group(group, week):
     course = group // 100
     h = 100 * course
@@ -107,14 +115,14 @@ def get_para_name(group, day, para_num, week):
     if data is None:
         return para_name
     if str(data[row]) == 'Физическое воспитание':
-        para_name = '└ 🏃Физическое воспитание'
+        para_name = '└ 🏃 Физическое воспитание'
         return para_name
     if not isNan(data[row]):
-        para_name += '└ 📚' + str(data[row]) + '\n'
+        para_name += '└ 📚 ' + str(data[row]) + '\n'
     if not isNan(data[row + 1]):
-        para_name += '└ 👨‍🏫' + str(data[row + 1]) + '\n'
+        para_name += '└ 👨‍🏫 ' + str(data[row + 1]) + '\n'
     if not isNan(data[row + 2]):
-        para_name += '└ 🏫' + str(data[row + 2])
+        para_name += '└ 🏫 ' + str(data[row + 2])
     if len(para_name) == 0:
         para_name = '└ 😴🌭🎮'
     return para_name
@@ -144,7 +152,7 @@ def get_timetable(group, day, week):
         print(get_log[0])
     text = ''
     for para_num in range(5):
-        text += '{} пара\n└ ⏰ {}\n'.format(para_num + 1, get_para_time(para_num, group))
+        text += bold('{} пара\n'.format(para_num + 1)) + '└ ⏰ ' + code('{}\n'.format(get_para_time(para_num, group)))
         text += get_para_name(group, day, para_num, week)
         text += '\n\n'
     return text
