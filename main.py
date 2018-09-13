@@ -1,10 +1,11 @@
-import telebot
-from telebot import apihelper
-from telebot import types
-import tokens
-import database
-from datetime import date
 import time
+from datetime import date
+
+import telebot
+from telebot import apihelper, types
+
+import database
+import tokens
 import utils
 
 bot = telebot.TeleBot(tokens.token, threaded=False)
@@ -12,12 +13,8 @@ apihelper.proxy = {'https': 'socks5://' + str(tokens.proxy)}
 
 
 @bot.message_handler(commands=['today'])
+@utils.check_user_exist(database.db)
 def send_today(message):
-    if not database.db.user_exist(message.chat.id):
-        bot.send_message(chat_id=message.chat.id,
-                         text='Вы ещё не зарегистрировались. Отправьте команду /start',
-                         reply_markup=types.ReplyKeyboardRemove())
-        return
     group = database.db.get_users_group(message.chat.id)
     # сдвигаем неделю, чтобы 0 отвечал за верхнюю
     week = (date.today().isocalendar()[1] + 1) % 2
@@ -26,7 +23,7 @@ def send_today(message):
         text_timetable = 'Сегодня воскресенье, какие пары?'
     else:
         text_timetable = utils.get_timetable(group, day, week)
-    bot.send_message(chat_id=message.chat.id, text=text_timetable, reply_markup=types.ReplyKeyboardRemove())
+    bot.send_message(chat_id=message.chat.id, text=text_timetable)
 
 
 @bot.message_handler(commands=['info'])
@@ -42,12 +39,12 @@ def send_info(message):
 
 @bot.message_handler(commands=['help'])
 def send_welcome(message):
-    bot.send_message(chat_id=message.chat.id, text='Test message', reply_markup=types.ReplyKeyboardRemove())
+    bot.send_message(chat_id=message.chat.id, text='Test message')
 
 
 @bot.message_handler(commands=['timetable'])
 def chose_course(message):
-    markup = types.ReplyKeyboardMarkup()
+    markup = types.ReplyKeyboardMarkup(one_time_keyboard=True)
     btn1 = types.KeyboardButton('Сегодня')
     btn2 = types.KeyboardButton('Понедельник')
     btn3 = types.KeyboardButton('Вторник')
@@ -82,46 +79,30 @@ def add_group_end(message):
 
 
 @bot.message_handler(commands=['check'])
+@utils.check_user_exist(database.db)
 def check_user_id(message):
-    if database.db.user_exist(message.chat.id):
-        group = database.db.get_users_group(message.chat.id)
-        bot.send_message(chat_id=message.chat.id, text='Ваша основная группа {}'.format(group))
-    else:
-        bot.send_message(chat_id=message.chat.id, text='Вы ещё не зарегистрировались. Отправьте команду /start')
+    group = database.db.get_users_group(message.chat.id)
+    bot.send_message(chat_id=message.chat.id, text='Ваша основная группа {}'.format(group))
 
 
 @bot.message_handler(content_types=['text'])
+@utils.check_user_exist(database.db)
 def send_timetable(message):
-    if not database.db.user_exist(message.chat.id):
-        bot.send_message(chat_id=message.chat.id,
-                         text='Вы ещё не зарегистрировались. Отправьте команду /start',
-                         reply_markup=types.ReplyKeyboardRemove())
-        return
-    group = database.db.get_users_group(message.chat.id)
-    # сдвигаем неделю, чтобы 0 отвечал за верхнюю
+    # Сдвигаем неделю, чтобы 0 отвечал за верхнюю
     week = (date.today().isocalendar()[1] + 1) % 2
     if date.today().weekday() == 6:
         week = (week + 1) % 2
-    text_timetable = 'Фича в разработке'
-    if message.text == 'Сегодня':
+
+    group = database.db.get_users_group(message.chat.id)
+
+    if message.text.lower() == 'сегодня':
         day = date.today().weekday()
-        if day == 6:
-            text_timetable = 'Сегодня воскресенье, какие пары?'
-        else:
-            text_timetable = utils.get_timetable(group, day, week)
-    if message.text == 'Понедельник':
-        text_timetable = utils.get_timetable(group, 0, week)
-    if message.text == 'Вторник':
-        text_timetable = utils.get_timetable(group, 1, week)
-    if message.text == 'Среда':
-        text_timetable = utils.get_timetable(group, 2, week)
-    if message.text == 'Четверг':
-        text_timetable = utils.get_timetable(group, 3, week)
-    if message.text == 'Пятница':
-        text_timetable = utils.get_timetable(group, 4, week)
-    if message.text == 'Суббота':
-        text_timetable = utils.get_timetable(group, 5, week)
-    bot.send_message(chat_id=message.chat.id, text=text_timetable, reply_markup=types.ReplyKeyboardRemove())
+        text_timetable = utils.get_timetable(group, day, week) if day != 6 else 'Сегодня воскресенье, какие пары?'
+    else:
+        day = utils.text_to_weekday(message.text)
+        text_timetable = utils.get_timetable(group, day, week) if day else 'Фича в разработке'
+
+    bot.send_message(chat_id=message.chat.id, text=text_timetable, parse_mode='HTML')
 
 
 while True:
@@ -130,4 +111,3 @@ while True:
     except Exception:
         print('Connection error, restart in 1 sec')
         time.sleep(1)
-
