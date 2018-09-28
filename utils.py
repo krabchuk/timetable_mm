@@ -2,8 +2,6 @@ import functools
 
 import pandas as pd
 
-from main import bot
-
 
 class TimetableData:
     def __init__(self, xls_filename):
@@ -141,6 +139,8 @@ def get_timetable(group, day, week):
 
 
 def check_user_exist(storage):
+    from main import bot
+
     def decorator(func):
         @functools.wraps(func)
         def wrapped(message):
