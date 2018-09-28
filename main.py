@@ -16,9 +16,7 @@ apihelper.proxy = {'https': 'socks5://' + str(tokens.proxy)}
 @utils.check_user_exist(database.db)
 def send_today(message):
     group = database.db.get_users_group(message.chat.id)
-    # сдвигаем неделю, чтобы 0 отвечал за верхнюю
-    week = (date.today().isocalendar()[1] + 1) % 2
-    day = date.today().weekday()
+    week, day = utils.get_week_and_day()
     if day == 6:
         text_timetable = 'Сегодня воскресенье, какие пары?'
     else:
@@ -90,12 +88,8 @@ def check_user_id(message):
 @bot.message_handler(content_types=['text'])
 @utils.check_user_exist(database.db)
 def send_timetable(message):
-    # Сдвигаем неделю, чтобы 0 отвечал за верхнюю
-    week = (date.today().isocalendar()[1] + 1) % 2
-    if date.today().weekday() == 6:
-        week = (week + 1) % 2
-
     group = database.db.get_users_group(message.chat.id)
+    week, day = utils.get_week_and_day()
 
     if message.text.lower() == 'сегодня':
         day = date.today().weekday()

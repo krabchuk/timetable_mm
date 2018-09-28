@@ -95,12 +95,12 @@ def get_para_name(group, day, para_num, week):
     if data is None:
         return para_name
     if str(data[row]) == 'Физическое воспитание':
-        para_name = '└ 🏃 Физическое воспитание'
+        para_name = '└ 🏃Физическое воспитание'
         return para_name
     if not is_nan(data[row]):
         para_name += '└ 📚 ' + str(data[row]) + '\n'
     if not is_nan(data[row + 1]):
-        para_name += '└ 👨‍🏫 ' + str(data[row + 1]) + '\n'
+        para_name += '└ ⏰ ' + str(data[row + 1]) + '\n'
     if not is_nan(data[row + 2]):
         para_name += '└ 🏫 ' + str(data[row + 2])
     if len(para_name) == 0:
@@ -132,7 +132,7 @@ def get_timetable(group, day, week):
         print(get_log[0])
     text = ''
     for para_num in range(5):
-        text += bold('{} пара\n'.format(para_num + 1)) + '└ ⏰ ' + code('{}\n'.format(get_para_time(para_num, group)))
+        text += '{} пара\n'.format(para_num + 1) + '└ ⏰ ' + '{}\n'.format(get_para_time(para_num, group))
         text += get_para_name(group, day, para_num, week)
         text += '\n\n'
     return text
@@ -154,3 +154,21 @@ def check_user_exist(storage):
         return wrapped
 
     return decorator
+
+
+def get_week_and_day():
+    from datetime import datetime
+
+    # сдвигаем неделю, чтобы 0 отвечал за верхнюю
+    week = (datetime.today().isocalendar()[1] + 1) % 2
+
+    # поправка на время Франкфурта
+    day = datetime.today().weekday()
+    if datetime.now().hour == 23:
+        day = (day + 1) % 7
+
+    # новая неделя начинается в субботу
+    if day == 6:
+        week = (week + 1) % 2
+
+    return week, day
