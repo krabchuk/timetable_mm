@@ -1,7 +1,6 @@
 import functools
-
 import pandas as pd
-
+from emoji import emojize
 
 class TimetableData:
     def __init__(self, xls_filename):
@@ -95,7 +94,7 @@ def get_para_name(group, day, para_num, week):
     if data is None:
         return para_name
     if str(data[row]) == 'Физическое воспитание':
-        para_name = '└ 🏃Физическое воспитание'
+        para_name = "└ 🏃 Физическое воспитание"
         return para_name
     if not is_nan(data[row]):
         para_name += '└ 📚 ' + str(data[row]) + '\n'
