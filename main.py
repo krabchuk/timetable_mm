@@ -96,7 +96,7 @@ def send_timetable(message):
         text_timetable = utils.get_timetable(group, day, week) if day != 6 else 'Сегодня воскресенье, какие пары?'
     else:
         day = utils.text_to_weekday(message.text)
-        text_timetable = utils.get_timetable(group, day, week) if day else 'Фича в разработке'
+        text_timetable = utils.get_timetable(group, day, week) if day is not None else 'Фича в разработке'
 
     bot.send_message(chat_id=message.chat.id, text=text_timetable, parse_mode='HTML')
 

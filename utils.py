@@ -1,6 +1,5 @@
 import functools
 import pandas as pd
-from emoji import emojize
 
 class TimetableData:
     def __init__(self, xls_filename):
