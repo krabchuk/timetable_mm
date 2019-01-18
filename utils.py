@@ -156,17 +156,13 @@ def check_user_exist(storage):
 
 def get_week_and_day():
     from datetime import datetime
-
+    from dateutil import tz
+    msk = tz.gettz('UTC+3')
+    now = datetime.now(msk)
     # сдвигаем неделю, чтобы 0 отвечал за верхнюю
-    week = (datetime.today().isocalendar()[1] + 1) % 2
-
-    # поправка на время Франкфурта
-    day = datetime.today().weekday()
-    if datetime.now().hour == 23:
-        day = (day + 1) % 7
-
+    week = (now.isocalendar()[1] + 1) % 2
+    day = now.weekday()
     # новая неделя начинается в субботу
     if day == 6:
         week = (week + 1) % 2
-
     return week, day

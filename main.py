@@ -101,9 +101,10 @@ def send_timetable(message):
     bot.send_message(chat_id=message.chat.id, text=text_timetable, parse_mode='HTML')
 
 
-while True:
-    try:
-        bot.polling(none_stop=True)
-    except Exception:
-        print('Connection error, restart in 1 sec')
-        time.sleep(1)
+if __name__ == '__main__':
+    while True:
+        try:
+            bot.polling(none_stop=True)
+        except Exception:
+            print('Connection error, restart in 1 sec')
+            time.sleep(1)
