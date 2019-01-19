@@ -1,6 +1,7 @@
 import functools
 import pandas as pd
 
+
 class TimetableData:
     def __init__(self, xls_filename):
         self.xls_file = pd.ExcelFile(xls_filename)
@@ -60,7 +61,7 @@ def bold(text, html=True):
 
 
 def code(text, html=True):
-    return '<code>{}</code>'.format(text) if html else'`{}`'.format(text)
+    return '<code>{}</code>'.format(text) if html else '`{}`'.format(text)
 
 
 def text_to_weekday(text):
@@ -166,3 +167,28 @@ def get_week_and_day():
     if day == 6:
         week = (week + 1) % 2
     return week, day
+
+
+def get_msk_time():
+    from datetime import datetime
+    from dateutil import tz
+    msk = tz.gettz('UTC+3')
+    return datetime.now(msk)
+
+
+def get_log_filename():
+    now = get_msk_time()
+    return '{0}_{1}_{2}_commands_log.txt'.format(str(now.year), str(now.month), str(now.day))
+
+
+def logger(func):
+    @functools.wraps(func)
+    def wrapped(message):
+        from database import db
+        user_id = message.chat.id
+        group = db.get_users_group(message.chat.id)
+        with open('./logs/' + get_log_filename(), 'a') as file:
+            print(get_msk_time(), user_id, group, message.text, file=file)
+        return func(message)
+
+    return wrapped

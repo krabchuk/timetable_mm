@@ -5,3 +5,9 @@ __pycache__/
 
 # IDE files
 .idea/
+
+# Logs
+logs/*.txt
+
+# Database
+database_users

@@ -13,6 +13,7 @@ apihelper.proxy = {'https': 'socks5://' + str(tokens.proxy)}
 
 
 @bot.message_handler(commands=['today'])
+@utils.logger
 @utils.check_user_exist(database.db)
 def send_today(message):
     group = database.db.get_users_group(message.chat.id)
@@ -25,6 +26,7 @@ def send_today(message):
 
 
 @bot.message_handler(commands=['info'])
+@utils.logger
 def send_info(message):
     info_text = """
 Timetable MM bot: v1.0
@@ -38,11 +40,13 @@ Timetable MM bot: v1.0
 
 
 @bot.message_handler(commands=['help'])
+@utils.logger
 def send_welcome(message):
     bot.send_message(chat_id=message.chat.id, text='Test message')
 
 
 @bot.message_handler(commands=['timetable'])
+@utils.logger
 def chose_course(message):
     markup = types.ReplyKeyboardMarkup(one_time_keyboard=True)
     btn1 = types.KeyboardButton('Сегодня')
@@ -59,12 +63,14 @@ def chose_course(message):
 
 
 @bot.message_handler(commands=['start'])
+@utils.logger
 def add_group_begin(message):
     database.add_user_db.add_id(message.chat.id)
     bot.send_message(chat_id=message.chat.id, text='Отправьте номер группы:')
 
 
 @bot.message_handler(func=lambda message: database.add_user_db.exist(message.chat.id))
+@utils.logger
 def add_group_end(message):
     if not str(message.text).isdigit():
         bot.send_message(chat_id=message.chat.id, text='Номер группы внезапно является числом, попробуй ещё раз')
@@ -79,6 +85,7 @@ def add_group_end(message):
 
 
 @bot.message_handler(commands=['check'])
+@utils.logger
 @utils.check_user_exist(database.db)
 def check_user_id(message):
     group = database.db.get_users_group(message.chat.id)
@@ -86,6 +93,7 @@ def check_user_id(message):
 
 
 @bot.message_handler(content_types=['text'])
+@utils.logger
 @utils.check_user_exist(database.db)
 def send_timetable(message):
     group = database.db.get_users_group(message.chat.id)
@@ -102,9 +110,15 @@ def send_timetable(message):
 
 
 if __name__ == '__main__':
-    while True:
-        try:
-            bot.polling(none_stop=True)
-        except Exception:
-            print('Connection error, restart in 1 sec')
-            time.sleep(1)
+    debug = False
+
+    if debug:
+        print(tokens.proxy, tokens.token)
+        bot.polling(none_stop=True)
+    else:
+        while True:
+            try:
+                bot.polling(none_stop=True)
+            except Exception:
+                print('Connection error, restart in 1 sec')
+                time.sleep(1)
