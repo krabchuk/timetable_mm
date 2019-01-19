@@ -9,7 +9,7 @@ import tokens
 import utils
 
 bot = telebot.TeleBot(tokens.token, threaded=False)
-apihelper.proxy = {'https': 'socks5://' + str(tokens.proxy)}
+
 
 
 @bot.message_handler(commands=['today'])
@@ -113,7 +113,7 @@ if __name__ == '__main__':
     debug = False
 
     if debug:
-        print(tokens.proxy, tokens.token)
+        apihelper.proxy = {'https': 'socks5://' + str(tokens.proxy)}
         bot.polling(none_stop=True)
     else:
         while True:
