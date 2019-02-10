@@ -9,11 +9,25 @@ class TimetableData:
         self.timetable_data = {}
         self.read()
 
+        self.para_names = set()
+        self.teacher_names = set()
+        self.read_para_names_and_teacher_names()
+
     def read(self):
         for course in range(1, 6 + 1):
             self.timetable_data[course] = {}
             for branch in range(1, 3 + (course > 2) + 1):
                 self.timetable_data[course][branch] = self.xls_file.parse('{}.{}'.format(course, branch))
+
+    def read_para_names_and_teacher_names(self):
+        for group in range (100, 700):
+            if group_valid(group):
+                for week in range (2):
+                    data = get_data_for_group(group, week)
+                    for para, day in range(5), range(7):
+                        row = day * 15 + para * 3
+                        self.para_names.add(str(data[row]))
+                        self.teacher_names.add(str(data[row + 1]))
 
     @staticmethod
     def group_branch(group):
