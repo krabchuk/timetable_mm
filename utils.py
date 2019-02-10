@@ -54,7 +54,7 @@ class TeachersCoursersStorage:
 
 
 timetable_up = TimetableData('osen_2018_up.xls')
-timetable_down = TimetableData('osen_2018_down.xls')
+timetable_down = TimetableData('vesna_2019_down.xls')
 
 
 get_log = [0]
@@ -180,8 +180,7 @@ def get_week_and_day():
     from dateutil import tz
     msk = tz.gettz('UTC+3')
     now = datetime.now(msk)
-    # сдвигаем неделю, чтобы 0 отвечал за верхнюю
-    week = (now.isocalendar()[1] + 1) % 2
+    week = now.isocalendar()[1] % 2
     day = now.weekday()
     # новая неделя начинается в субботу
     if day == 6:
@@ -212,6 +211,3 @@ def logger(func):
         return func(message)
 
     return wrapped
-
-def print_names():
-    print()
