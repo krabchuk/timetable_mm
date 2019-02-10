@@ -9,25 +9,11 @@ class TimetableData:
         self.timetable_data = {}
         self.read()
 
-        self.para_names = set()
-        self.teacher_names = set()
-        self.read_para_names_and_teacher_names()
-
     def read(self):
         for course in range(1, 6 + 1):
             self.timetable_data[course] = {}
             for branch in range(1, 3 + (course > 2) + 1):
                 self.timetable_data[course][branch] = self.xls_file.parse('{}.{}'.format(course, branch))
-
-    def read_para_names_and_teacher_names(self):
-        for group in range (100, 700):
-            if group_valid(group):
-                for week in range (2):
-                    data = get_data_for_group(group, week)
-                    for para, day in range(5), range(7):
-                        row = day * 15 + para * 3
-                        self.para_names.add(str(data[row]))
-                        self.teacher_names.add(str(data[row + 1]))
 
     @staticmethod
     def group_branch(group):
@@ -48,8 +34,28 @@ class TimetableData:
         return self.timetable_data[course][branch][group]
 
 
+class TeachersCoursersStorage:
+    def __init__(self):
+        self.teachers = set()
+        self.courses = set()
+
+        for group in range (100, 700):
+            if group_valid(group):
+                for week in range (2):
+                    data = get_data_for_group(group, week)
+                    for para, day in zip(range(5), range(7)):
+                        row = day * 15 + para * 3
+                        self.courses.add(str(data[row]))
+                        self.teachers.add(str(data[row + 1]))
+
+    def print(self):
+        print(self.courses)
+        print(self.teachers)
+
+
 timetable_up = TimetableData('osen_2018_up.xls')
 timetable_down = TimetableData('osen_2018_down.xls')
+
 
 get_log = [0]
 
@@ -59,8 +65,8 @@ def group_valid(group):
             200 < group < 213 or 220 < group < 227 or \
             300 < group < 313 or 320 < group < 327 or 330 < group < 334 or \
             400 < group < 413 or 420 < group < 427 or 430 < group < 434 or \
-            500 < group < 513 or 520 < group < 527 or 530 < group < 534 or \
-            600 < group < 613 or 620 < group < 627 or 630 < group < 634:
+            500 < group < 512 or 520 < group < 527 or 530 < group < 533 or \
+            600 < group < 612 or 620 < group < 627 or 630 < group < 633:
         return True
     else:
         return False
@@ -206,3 +212,6 @@ def logger(func):
         return func(message)
 
     return wrapped
+
+def print_names():
+    print()
