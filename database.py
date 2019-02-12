@@ -1,4 +1,5 @@
 import sqlite3
+import utils
 
 table_sql = 'CREATE TABLE IF NOT EXISTS users (id integer, group_num integer)'
 
@@ -58,6 +59,17 @@ class SmallStorage:
             return True
         else:
             return False
+
+
+class TotalOwnTimetablesStorage:
+    def __init__(self):
+        self.db = {}
+
+    def put_student_tt(self, storage):
+        self.db[storage.id] = storage
+
+    def get_student_tt(self, id):
+        return self.db[id]
 
 
 db = DataStorage(db_file, table_sql)

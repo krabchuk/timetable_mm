@@ -1,5 +1,6 @@
 import functools
 import pandas as pd
+from os.path import isfile
 
 
 class TimetableData:
@@ -39,9 +40,9 @@ class TeachersCoursersStorage:
         self.teachers = set()
         self.courses = set()
 
-        for group in range (100, 700):
+        for group in range(100, 700):
             if group_valid(group):
-                for week in range (2):
+                for week in range(2):
                     data = get_data_for_group(group, week)
                     for para, day in zip(range(5), range(7)):
                         row = day * 15 + para * 3
@@ -51,6 +52,31 @@ class TeachersCoursersStorage:
     def print(self):
         print(self.courses)
         print(self.teachers)
+
+
+class OwnTimetableStorage:
+    def __init__(self, id, group):
+        self.id = id
+        self.actual_group = group
+        self.actual_tt = []
+
+        # Check files for existing
+        name = './user_timetables/' + \
+               str(id) + '_' + str(group) + '_'
+        for week in range(2):
+            if isfile(name + str(week)):
+                self.actual_tt[week] = pd.read_csv(name + str(week))
+            else:
+                self.actual_tt[week] = get_data_for_group(group, week)
+
+        self.backup_actual_tt()
+
+    def get_tt(self, week):
+        return self.actual_tt[week]
+
+    def backup_actual_tt(self):
+        for week in range(2):
+            self.actual_tt[week].to_csv(str(self.id) + '_' + str(self.actual_group) + '_' + str(week))
 
 
 timetable_up = TimetableData('osen_2018_up.xls')
