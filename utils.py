@@ -1,6 +1,7 @@
 import functools
 import pandas as pd
 from os.path import isfile
+from database import tt_storage
 
 
 class TimetableData:
@@ -60,23 +61,38 @@ class OwnTimetableStorage:
         self.actual_group = group
         self.actual_tt = []
 
-        # Check files for existing
-        name = './user_timetables/' + \
-               str(id) + '_' + str(group) + '_'
-        for week in range(2):
-            if isfile(name + str(week)):
-                self.actual_tt[week] = pd.read_csv(name + str(week))
-            else:
-                self.actual_tt[week] = get_data_for_group(group, week)
-
+        self.update_actual_tt()
         self.backup_actual_tt()
 
     def get_tt(self, week):
         return self.actual_tt[week]
 
+    def update_actual_tt(self):
+        name = './user_timetables/' + \
+               str(self.id) + '_' + str(self.actual_group) + '_'
+        for week in range(2):
+            if isfile(name + str(week)):
+                self.actual_tt[week] = pd.read_csv(name + str(week))
+            else:
+                self.actual_tt[week] = get_data_for_group(self.actual_group, week)
+
     def backup_actual_tt(self):
         for week in range(2):
             self.actual_tt[week].to_csv(str(self.id) + '_' + str(self.actual_group) + '_' + str(week))
+
+    def change_actual_group(self, group):
+        if self.actual_group == group:
+            pass
+        self.actual_group = group
+        self.update_actual_tt()
+        self.backup_actual_tt()
+
+    # Field type: 0 for course name
+    #             1 for teacher name
+    #             2 for class name
+    def change_actual_tt(self, week, day, para, field_type, data):
+        self.actual_tt[week][day * 5 + para * 3 + field_type] = data
+        self.backup_actual_tt()
 
 
 timetable_up = TimetableData('osen_2018_up.xls')
@@ -134,6 +150,7 @@ def get_data_for_group(group, week):
 
 
 def get_para_name(group, day, para_num, week):
+    data = tt_storage.get_student_tt()
     data = get_data_for_group(group, week)
     row = day * 15 + para_num * 3
     para_name = ''

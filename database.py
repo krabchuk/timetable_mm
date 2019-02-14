@@ -65,12 +65,13 @@ class TotalOwnTimetablesStorage:
     def __init__(self):
         self.db = {}
 
-    def put_student_tt(self, storage):
-        self.db[storage.id] = storage
-
     def get_student_tt(self, id):
+        # Create data if doesnt exist
+        if id not in self.db:
+            self.db[id] = utils.OwnTimetableStorage(id, db.get_users_group(id))
         return self.db[id]
 
 
+tt_storage = TotalOwnTimetablesStorage()
 db = DataStorage(db_file, table_sql)
 add_user_db = SmallStorage()
