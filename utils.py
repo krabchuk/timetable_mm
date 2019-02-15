@@ -201,7 +201,7 @@ def get_para_time(para_num, group):
 
 def get_actual_timetable(user_id, manual_day=None):
     week, day = get_week_and_day()
-    if not is_nan(manual_day):
+    if manual_day is not None:
         day = manual_day
     if day == 6:
         return "Сегодня воскресенье, какие пары?"
