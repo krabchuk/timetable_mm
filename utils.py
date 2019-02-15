@@ -79,8 +79,6 @@ class OwnTimetableStorage:
                 self.actual_tt[week] = pd.read_csv(self.get_filepath(week), header=None)[0]
             else:
                 self.actual_tt[week] = get_data_for_group(self.actual_group, week)
-        for i in range(90):
-            print(self.actual_tt[1][i])
 
     def backup_actual_tt(self):
         for week in range(2):
