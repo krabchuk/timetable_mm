@@ -96,25 +96,24 @@ def check_user_id(message):
 @utils.logger
 @utils.check_user_exist(database.db)
 def send_timetable(message):
-    group = database.db.get_users_group(message.chat.id)
-    week, day = utils.get_week_and_day()
+    user_id = message.chat.id
 
     if message.text.lower() == 'сегодня':
-        day = date.today().weekday()
-        text_timetable = utils.get_timetable(group, day, week) if day != 6 else 'Сегодня воскресенье, какие пары?'
+        text_timetable = utils.get_actual_timetable(user_id)
     else:
         day = utils.text_to_weekday(message.text)
-        text_timetable = utils.get_timetable(group, day, week) if day is not None else 'Фича в разработке'
+        text_timetable = utils.get_actual_timetable(user_id) if day is not None else 'Фича в разработке'
 
     bot.send_message(chat_id=message.chat.id, text=text_timetable, parse_mode='HTML')
 
 
 if __name__ == '__main__':
-    debug = False
+    debug = True
 
     if debug:
-        apihelper.proxy = {'https': 'socks5://' + str(tokens.proxy)}
-        bot.polling(none_stop=True)
+        _ = utils.OwnTimetableStorage(0, 101)
+        #apihelper.proxy = {'https': 'socks5://' + str(tokens.proxy)}
+        #bot.polling(none_stop=True)
     else:
         while True:
             try:

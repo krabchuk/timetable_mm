@@ -1,7 +1,7 @@
 import functools
 import pandas as pd
 from os.path import isfile
-from database import tt_storage
+from database import tt_storage, db
 
 
 class TimetableData:
@@ -149,9 +149,17 @@ def get_data_for_group(group, week):
     return timetable_data.group_data(group)
 
 
+def get_actual_para_name(user_id, day, para_num, week):
+    data = tt_storage.get_student_tt(user_id).get_tt(week)
+    return get_para_name_from_data(data, day, para_num)
+
+
 def get_para_name(group, day, para_num, week):
-    data = tt_storage.get_student_tt()
     data = get_data_for_group(group, week)
+    return get_para_name_from_data(data, day, para_num)
+
+
+def get_para_name_from_data(data, day, para_num):
     row = day * 15 + para_num * 3
     para_name = ''
     if data is None:
@@ -188,10 +196,21 @@ def get_para_time(para_num, group):
         return '16:45 — 18:20'
 
 
+def get_actual_timetable(user_id, manual_day=None):
+    week, day = get_week_and_day()
+    if manual_day:
+        day = manual_day
+    if day == 6:
+        return "Сегодня воскресенье, какие пары?"
+    text = ''
+    for para_num in range(5):
+        text += '{} пара\n'.format(para_num + 1) + \
+                '└ ⏰ ' + '{}\n'.format(get_para_time(para_num, db.get_users_group(user_id)))
+        text += get_actual_para_name(user_id, day, para_num, week)
+        text += '\n\n'
+
+
 def get_timetable(group, day, week):
-    get_log[0] += 1
-    if get_log[0] % 100 == 0:
-        print(get_log[0])
     text = ''
     for para_num in range(5):
         text += '{} пара\n'.format(para_num + 1) + '└ ⏰ ' + '{}\n'.format(get_para_time(para_num, group))
