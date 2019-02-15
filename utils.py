@@ -1,5 +1,6 @@
 import functools
 import pandas as pd
+import numpy as np
 from os.path import isfile
 from database import tt_storage
 from database import db
@@ -75,13 +76,15 @@ class OwnTimetableStorage:
     def update_actual_tt(self):
         for week in range(2):
             if isfile(self.get_filepath(week)):
-                self.actual_tt[week] = pd.read_csv(self.get_filepath(week))
+                self.actual_tt[week] = pd.read_csv(self.get_filepath(week), header=None)[0]
             else:
                 self.actual_tt[week] = get_data_for_group(self.actual_group, week)
+        for i in range(90):
+            print(self.actual_tt[1][i])
 
     def backup_actual_tt(self):
         for week in range(2):
-            self.actual_tt[week].to_csv(self.get_filepath(week))
+            self.actual_tt[week].to_csv(self.get_filepath(week), index=False, header=False)
 
     def change_actual_group(self, group):
         if self.actual_group == group:
