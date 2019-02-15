@@ -1,7 +1,8 @@
 import functools
 import pandas as pd
 from os.path import isfile
-from database import tt_storage, db
+from database import tt_storage
+from database import db
 
 
 class TimetableData:
@@ -56,10 +57,11 @@ class TeachersCoursersStorage:
 
 
 class OwnTimetableStorage:
-    def __init__(self, id, group):
-        self.id = id
+    def __init__(self, user_id, group):
+        self.id = user_id
         self.actual_group = group
-        self.actual_tt = []
+        self.actual_tt = [None] * 2
+        self.file_prefix = './user_timetables/'
 
         self.update_actual_tt()
         self.backup_actual_tt()
@@ -67,18 +69,19 @@ class OwnTimetableStorage:
     def get_tt(self, week):
         return self.actual_tt[week]
 
+    def get_filepath(self, week):
+        return self.file_prefix + str(self.id) + '_' + str(self.actual_group) + '_' + str(week) + '.txt'
+
     def update_actual_tt(self):
-        name = './user_timetables/' + \
-               str(self.id) + '_' + str(self.actual_group) + '_'
         for week in range(2):
-            if isfile(name + str(week)):
-                self.actual_tt[week] = pd.read_csv(name + str(week))
+            if isfile(self.get_filepath(week)):
+                self.actual_tt[week] = pd.read_csv(self.get_filepath(week))
             else:
                 self.actual_tt[week] = get_data_for_group(self.actual_group, week)
 
     def backup_actual_tt(self):
         for week in range(2):
-            self.actual_tt[week].to_csv(str(self.id) + '_' + str(self.actual_group) + '_' + str(week))
+            self.actual_tt[week].to_csv(self.get_filepath(week))
 
     def change_actual_group(self, group):
         if self.actual_group == group:
@@ -198,7 +201,7 @@ def get_para_time(para_num, group):
 
 def get_actual_timetable(user_id, manual_day=None):
     week, day = get_week_and_day()
-    if manual_day:
+    if not is_nan(manual_day):
         day = manual_day
     if day == 6:
         return "Сегодня воскресенье, какие пары?"
@@ -208,6 +211,7 @@ def get_actual_timetable(user_id, manual_day=None):
                 '└ ⏰ ' + '{}\n'.format(get_para_time(para_num, db.get_users_group(user_id)))
         text += get_actual_para_name(user_id, day, para_num, week)
         text += '\n\n'
+    return text
 
 
 def get_timetable(group, day, week):

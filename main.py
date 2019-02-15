@@ -1,5 +1,4 @@
 import time
-from datetime import date
 
 import telebot
 from telebot import apihelper, types
@@ -11,17 +10,11 @@ import utils
 bot = telebot.TeleBot(tokens.token, threaded=False)
 
 
-
 @bot.message_handler(commands=['today'])
 @utils.logger
 @utils.check_user_exist(database.db)
 def send_today(message):
-    group = database.db.get_users_group(message.chat.id)
-    week, day = utils.get_week_and_day()
-    if day == 6:
-        text_timetable = 'Сегодня воскресенье, какие пары?'
-    else:
-        text_timetable = utils.get_timetable(group, day, week)
+    text_timetable = utils.get_actual_timetable(message.chat.id)
     bot.send_message(chat_id=message.chat.id, text=text_timetable)
 
 
@@ -81,6 +74,7 @@ def add_group_end(message):
         return
     database.add_user_db.rm_id(message.chat.id)
     database.db.add_user(message.chat.id, int(message.text))
+    database.tt_storage.get_student_tt(message.chat.id).change_actual_group(int(message.text))
     bot.send_message(chat_id=message.chat.id, text='Теперь номер твоей группы {}'.format(int(message.text)))
 
 

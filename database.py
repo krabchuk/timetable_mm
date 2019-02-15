@@ -1,5 +1,4 @@
 import sqlite3
-import utils
 
 table_sql = 'CREATE TABLE IF NOT EXISTS users (id integer, group_num integer)'
 
@@ -65,11 +64,12 @@ class TotalOwnTimetablesStorage:
     def __init__(self):
         self.db = {}
 
-    def get_student_tt(self, id):
+    def get_student_tt(self, user_id):
         # Create data if doesnt exist
-        if id not in self.db:
-            self.db[id] = utils.OwnTimetableStorage(id, db.get_users_group(id))
-        return self.db[id]
+        if user_id not in self.db:
+            import utils
+            self.db[user_id] = utils.OwnTimetableStorage(user_id, db.get_users_group(user_id))
+        return self.db[user_id]
 
 
 tt_storage = TotalOwnTimetablesStorage()

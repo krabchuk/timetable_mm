@@ -9,5 +9,8 @@ __pycache__/
 # Logs
 logs/*.txt
 
+# More data
+user_timetables/*.txt
+
 # Database
 database_users
