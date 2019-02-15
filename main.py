@@ -96,18 +96,18 @@ def send_timetable(message):
         text_timetable = utils.get_actual_timetable(user_id)
     else:
         day = utils.text_to_weekday(message.text)
-        text_timetable = utils.get_actual_timetable(user_id) if day is not None else 'Фича в разработке'
+        text_timetable = utils.get_actual_timetable(user_id, day) if day is not None else 'Фича в разработке'
 
     bot.send_message(chat_id=message.chat.id, text=text_timetable, parse_mode='HTML')
 
 
 if __name__ == '__main__':
-    debug = True
+    debug = False
 
     if debug:
-        _ = utils.OwnTimetableStorage(0, 101)
-        #apihelper.proxy = {'https': 'socks5://' + str(tokens.proxy)}
-        #bot.polling(none_stop=True)
+        #_ = utils.OwnTimetableStorage(0, 101)
+        apihelper.proxy = {'https': 'socks5://' + str(tokens.proxy)}
+        bot.polling(none_stop=True)
     else:
         while True:
             try:
