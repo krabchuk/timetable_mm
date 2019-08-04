@@ -10,6 +10,31 @@ import utils
 bot = telebot.TeleBot(tokens.token, threaded=False)
 
 
+@bot.message_handler(commands=['admin'])
+@utils.logger
+def admin_panel(message):
+    user_id = message.chat.id
+
+    if database.admins_db.exist(user_id):
+        bot.send_message(chat_id=user_id, text='WIP')
+    else:
+        database.admins_db.add_id(user_id)
+        bot.send_message(chat_id=user_id, text='Send admin\'s password')
+
+
+@bot.message_handler(func=lambda message: database.add_admins_db.exist(message.chat.id))
+@utils.logger
+def add_admin(message):
+    user_id = message.chat.id
+
+    if message.text == tokens.add_admin_password:
+        database.admins_db.add_id(user_id)
+    else:
+        bot.send_message(chat_id=user_id, text='Wrong password. This accident will be reported.')
+        for admin_id in database.admins_db:
+            bot.send_message(chat_id=admin_id, text='Login attempt from @{}'.format(message.from_user.username))
+
+
 @bot.message_handler(commands=['today'])
 @utils.logger
 @utils.check_user_exist(database.db)
@@ -22,7 +47,7 @@ def send_today(message):
 @utils.logger
 def send_info(message):
     info_text = """
-Timetable MM bot: v1.0
+Timetable MM bot: v1.1
 Благодарности:
 Кириллу Сапунову за помощь в парсинге расписания,
 Яне Нагорных за подготовку аватара, дизайн и за то, что она лучшая староста в мире:3
@@ -102,11 +127,11 @@ def send_timetable(message):
 
 
 if __name__ == '__main__':
-    debug = False
+    debug = True
 
     if debug:
         #_ = utils.OwnTimetableStorage(0, 101)
-        apihelper.proxy = {'https': 'socks5://' + str(tokens.proxy)}
+        #apihelper.proxy = {'https': 'socks5://' + str(tokens.proxy)}
         bot.polling(none_stop=True)
     else:
         while True:

@@ -41,6 +41,10 @@ class SmallStorage:
         else:
             return False
 
+    def __iter__(self):
+        for item in self.data:
+            yield item
+
 
 class TotalOwnTimetablesStorage:
     def __init__(self):
@@ -57,3 +61,6 @@ class TotalOwnTimetablesStorage:
 tt_storage = TotalOwnTimetablesStorage()
 db = DataStorage()
 add_user_db = SmallStorage()
+
+admins_db = SmallStorage()
+add_admins_db = SmallStorage()
