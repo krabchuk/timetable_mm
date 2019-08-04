@@ -18,8 +18,8 @@ def admin_panel(message):
     if database.admins_db.exist(user_id):
         bot.send_message(chat_id=user_id, text='WIP')
     else:
-        database.admins_db.add_id(user_id)
-        bot.send_message(chat_id=user_id, text='Send admin\'s password')
+        database.add_admins_db.add_id(user_id)
+        bot.send_message(chat_id=user_id, text='Send admin\'s password.')
 
 
 @bot.message_handler(func=lambda message: database.add_admins_db.exist(message.chat.id))
@@ -29,6 +29,7 @@ def add_admin(message):
 
     if message.text == tokens.add_admin_password:
         database.admins_db.add_id(user_id)
+        bot.send_message(chat_id=user_id, text='Successfully added.')
     else:
         bot.send_message(chat_id=user_id, text='Wrong password. This accident will be reported.')
         for admin_id in database.admins_db:
