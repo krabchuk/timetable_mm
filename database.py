@@ -25,27 +25,6 @@ class DataStorage:
             return 0
 
 
-class SmallStorage:
-    def __init__(self):
-        self.data = set()
-
-    def add_id(self, user_id):
-        self.data.add(user_id)
-
-    def rm_id(self, user_id):
-        self.data.remove(user_id)
-
-    def exist(self, user_id):
-        if user_id in self.data:
-            return True
-        else:
-            return False
-
-    def __iter__(self):
-        for item in self.data:
-            yield item
-
-
 class TotalOwnTimetablesStorage:
     def __init__(self):
         self.db = {}
@@ -58,9 +37,32 @@ class TotalOwnTimetablesStorage:
         return self.db[user_id]
 
 
+class AdminsStorage:
+    def __init__(self):
+        client = MongoClient(port=27017)
+        self.admins = client.database.admins
+
+    def add_admin(self, admin_id):
+        self.admins.insert_one({'id': admin_id})
+
+    def remove_admin(self, admin_id):
+        self.admins.delete_many({'id': admin_id})
+
+    def exist(self, admin_id):
+        if self.admins.find_one({'id': admin_id}):
+            return True
+        else:
+            return False
+
+    def __iter__(self):
+        admins_ids = self.admins.find({})
+        for admin in admins_ids:
+            yield admin.get('id')
+
+
 tt_storage = TotalOwnTimetablesStorage()
 db = DataStorage()
-add_user_db = SmallStorage()
+add_user_db = set()
 
-admins_db = SmallStorage()
-add_admins_db = SmallStorage()
+admins_db = AdminsStorage()
+add_admins_db = set()

@@ -18,17 +18,18 @@ def admin_panel(message):
     if database.admins_db.exist(user_id):
         bot.send_message(chat_id=user_id, text='WIP')
     else:
-        database.add_admins_db.add_id(user_id)
+        database.add_admins_db.add(user_id)
         bot.send_message(chat_id=user_id, text='Send admin\'s password.')
 
 
-@bot.message_handler(func=lambda message: database.add_admins_db.exist(message.chat.id))
+@bot.message_handler(func=lambda message: message.chat.id in database.add_admins_db)
 @utils.logger
 def add_admin(message):
     user_id = message.chat.id
 
+    database.add_admins_db.discard(user_id)
     if message.text == tokens.add_admin_password:
-        database.admins_db.add_id(user_id)
+        database.admins_db.add_admin(user_id)
         bot.send_message(chat_id=user_id, text='Successfully added.')
     else:
         bot.send_message(chat_id=user_id, text='Wrong password. This accident will be reported.')
@@ -85,11 +86,11 @@ def chose_course(message):
 @bot.message_handler(commands=['start'])
 @utils.logger
 def add_group_begin(message):
-    database.add_user_db.add_id(message.chat.id)
+    database.add_user_db.add(message.chat.id)
     bot.send_message(chat_id=message.chat.id, text='Отправьте номер группы:')
 
 
-@bot.message_handler(func=lambda message: database.add_user_db.exist(message.chat.id))
+@bot.message_handler(func=lambda message: message.chat.id in database.add_user_db)
 @utils.logger
 def add_group_end(message):
     if not str(message.text).isdigit():
@@ -99,7 +100,7 @@ def add_group_end(message):
     if not utils.group_valid(group):
         bot.send_message(chat_id=message.chat.id, text='Такой группы не существует, попробуй ещё раз')
         return
-    database.add_user_db.rm_id(message.chat.id)
+    database.add_user_db.discard(message.chat.id)
     database.db.add_user(message.chat.id, int(message.text))
     database.tt_storage.get_student_tt(message.chat.id).change_actual_group(int(message.text))
     bot.send_message(chat_id=message.chat.id, text='Теперь номер твоей группы {}'.format(int(message.text)))
