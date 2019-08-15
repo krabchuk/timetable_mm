@@ -1,12 +1,42 @@
 import functools
 import pandas as pd
-import numpy as np
 from os.path import isfile
-from database import tt_storage
-from database import db
+import database
+from pymongo import MongoClient
 
 
-class TimetableData:
+class TimeTableData:
+    def __init__(self):
+        client = MongoClient(port=27017)
+        db = client.database
+        self.time_table = db.admin_timetable
+
+        branch_offset = [0, 0, 8, 20, 30]
+        row_name = ["class", "teacher", "room"]
+
+        for week in ['up', 'down']:
+            xls_file = pd.ExcelFile("osen_2018_" + week + ".xls")
+            for course in range(1, 7):
+                for branch in range(1, 3 + (course > 2) + 1):
+                    data = xls_file.parse('{}.{}'.format(course, branch))
+                    for group_num, group in enumerate(data.items()):
+                        actual_group = course * 100 + branch_offset[branch] + group_num
+                        for row_num, row in enumerate(group[1]):
+                            para_num = row_num // 3
+                            row_name_num = row_num % 3
+                            if row_name_num == 0:
+                                self.time_table.insert_one({'week': week,
+                                                            'course': course,
+                                                            'group': actual_group,
+                                                            'para_num': para_num})
+                            self.time_table.update_one({'week': week,
+                                                        'course': course,
+                                                        'group': actual_group,
+                                                        'para_num': para_num},
+                                                       {'$set': {row_name[row_name_num]: row}})
+
+
+class TimetableDataDeprecated:
     def __init__(self, xls_filename):
         self.xls_file = pd.ExcelFile(xls_filename)
 
@@ -99,8 +129,8 @@ class OwnTimetableStorage:
         self.backup_actual_tt()
 
 
-timetable_up = TimetableData('osen_2018_up.xls')
-timetable_down = TimetableData('vesna_2019_down.xls')
+timetable_up = TimetableDataDeprecated('osen_2018_up.xls')
+timetable_down = TimetableDataDeprecated('vesna_2019_down.xls')
 
 
 get_log = [0]
@@ -159,6 +189,7 @@ def get_actual_para_name(user_id, day, para_num, week):
 
 
 def get_para_name(group, day, para_num, week):
+
     data = get_data_for_group(group, week)
     return get_para_name_from_data(data, day, para_num)
 
