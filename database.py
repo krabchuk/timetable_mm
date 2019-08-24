@@ -8,7 +8,7 @@ class TimeTableData:
         db = client.database
         self.time_table = db.test_timetable
 
-        load = False
+        load = True
 
         if load:
             branch_offset = [0, 0, 8, 20, 30]
@@ -32,18 +32,19 @@ class TimeTableData:
                                                                 'day': day,
                                                                 'para_num': para_num})
 
-                                if row:
-                                    self.time_table.update_one({'week': week_num,
-                                                                'group': actual_group,
-                                                                'day': day,
-                                                                'para_num': para_num},
-                                                               {'$set': {row_name[row_name_num]: str(row)}})
-                                else:
+                                if row != row:
                                     self.time_table.update_one({'week': week_num,
                                                                 'group': actual_group,
                                                                 'day': day,
                                                                 'para_num': para_num},
                                                                {'$set': {row_name[row_name_num]: ""}})
+                                else:
+                                    self.time_table.update_one({'week': week_num,
+                                                                'group': actual_group,
+                                                                'day': day,
+                                                                'para_num': para_num},
+                                                               {'$set': {row_name[row_name_num]: str(row)}})
+
 
     def get_para_data(self, week, group, day, para_num):
         return self.time_table.find_one({'week': week,

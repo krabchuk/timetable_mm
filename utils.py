@@ -50,16 +50,21 @@ def get_actual_timetable(user_id, manual_day=None):
 def get_actual_para_name(user_id, week, group, day, para_num):
     para_data = database.timetable_db.get_para_data(week, group, day, para_num)
 
-    if len(para_data) == 0:
-        return '└ 😴🌭🎮'
     if para_data['class'] == 'Физическое воспитание':
         return "└ 🏃 Физическое воспитание"
 
     para_name = ''
-    para_name += '└ 📚 ' + para_data['class'] + '\n'
-    para_name += '└ 👨‍🏫 ' + para_data['teacher'] + '\n'
-    para_name += '└ 🏫 ' + para_data['room']
-    return para_name
+    if len(para_data['class']):
+        para_name += '└ 📚 ' + para_data['class'] + '\n'
+    if len(para_data['teacher']):
+        para_name += '└ 👨‍🏫 ' + para_data['teacher'] + '\n'
+    if len(para_data['room']):
+        para_name += '└ 🏫 ' + para_data['room']
+
+    if len(para_name):
+        return para_name
+    else:
+        return '└ 😴🌭🎮'
 
 
 def get_para_time(para_num, group):
