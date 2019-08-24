@@ -2,38 +2,6 @@ import functools
 import pandas as pd
 from os.path import isfile
 import database
-from pymongo import MongoClient
-
-
-class TimeTableData:
-    def __init__(self):
-        client = MongoClient(port=27017)
-        db = client.database
-        self.time_table = db.admin_timetable
-
-        branch_offset = [0, 0, 8, 20, 30]
-        row_name = ["class", "teacher", "room"]
-
-        for week in ['up', 'down']:
-            xls_file = pd.ExcelFile("osen_2018_" + week + ".xls")
-            for course in range(1, 7):
-                for branch in range(1, 3 + (course > 2) + 1):
-                    data = xls_file.parse('{}.{}'.format(course, branch))
-                    for group_num, group in enumerate(data.items()):
-                        actual_group = course * 100 + branch_offset[branch] + group_num
-                        for row_num, row in enumerate(group[1]):
-                            para_num = row_num // 3
-                            row_name_num = row_num % 3
-                            if row_name_num == 0:
-                                self.time_table.insert_one({'week': week,
-                                                            'course': course,
-                                                            'group': actual_group,
-                                                            'para_num': para_num})
-                            self.time_table.update_one({'week': week,
-                                                        'course': course,
-                                                        'group': actual_group,
-                                                        'para_num': para_num},
-                                                       {'$set': {row_name[row_name_num]: row}})
 
 
 class TimetableDataDeprecated:
@@ -184,8 +152,19 @@ def get_data_for_group(group, week):
 
 
 def get_actual_para_name(user_id, day, para_num, week):
-    data = tt_storage.get_student_tt(user_id).get_tt(week)
-    return get_para_name_from_data(data, day, para_num)
+    group = database.users_db.get_users_group(user_id)
+    para_data = database.timetable_db.get_para_data(week, group, day, para_num)
+
+    if len(para_data) == 0:
+        return '└ 😴🌭🎮'
+    if para_data['class'] == 'Физическое воспитание':
+        return "└ 🏃 Физическое воспитание"
+
+    para_name = ''
+    para_name += '└ 📚 ' + para_data['class'] + '\n'
+    para_name += '└ 👨‍🏫 ' + para_data['teacher'] + '\n'
+    para_name += '└ 🏫 ' + para_data['room']
+    return para_name
 
 
 def get_para_name(group, day, para_num, week):
@@ -240,7 +219,7 @@ def get_actual_timetable(user_id, manual_day=None):
     text = ''
     for para_num in range(5):
         text += '{} пара\n'.format(para_num + 1) + \
-                '└ ⏰ ' + '{}\n'.format(get_para_time(para_num, db.get_users_group(user_id)))
+                '└ ⏰ ' + '{}\n'.format(get_para_time(para_num, database.users_db.get_users_group(user_id)))
         text += get_actual_para_name(user_id, day, para_num, week)
         text += '\n\n'
     return text
@@ -301,9 +280,9 @@ def get_log_filename():
 def logger(func):
     @functools.wraps(func)
     def wrapped(message):
-        from database import db
+        from database import users_db
         user_id = message.chat.id
-        group = db.get_users_group(message.chat.id)
+        group = users_db.get_users_group(message.chat.id)
         with open('./logs/' + get_log_filename(), 'a') as file:
             print(get_msk_time(), user_id, group, message.text, file=file)
         return func(message)

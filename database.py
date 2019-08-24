@@ -1,4 +1,57 @@
 from pymongo import MongoClient
+import pandas as pd
+
+
+class TimeTableData:
+    def __init__(self):
+        client = MongoClient(port=27017)
+        db = client.database
+        self.time_table = db.test_timetable
+
+        load = False
+
+        if load:
+            branch_offset = [0, 0, 8, 20, 30]
+            row_name = ["class", "teacher", "room"]
+
+            for week_num, week in enumerate(['up', 'down']):
+                xls_file = pd.ExcelFile("osen_2018_" + week + ".xls")
+                for course in range(1, 7):
+                    for branch in range(1, 3 + (course > 2) + 1):
+                        data = xls_file.parse('{}.{}'.format(course, branch))
+                        for group_num, group in enumerate(data.items()):
+                            actual_group = course * 100 + branch_offset[branch] + group_num
+                            for row_num, row in enumerate(group[1]):
+                                day = row_num // 15
+                                local_row_num = row_num - day * 15
+                                para_num = local_row_num // 3
+                                row_name_num = local_row_num % 3
+                                if row_name_num == 0:
+                                    self.time_table.insert_one({'week': week_num,
+                                                                'group': actual_group,
+                                                                'day': day,
+                                                                'para_num': para_num})
+
+                                if row:
+                                    self.time_table.update_one({'week': week_num,
+                                                                'group': actual_group,
+                                                                'day': day,
+                                                                'para_num': para_num},
+                                                               {'$set': {row_name[row_name_num]: row}})
+                                else:
+                                    self.time_table.update_one({'week': week_num,
+                                                                'group': actual_group,
+                                                                'day': day,
+                                                                'para_num': para_num},
+                                                               {'$set': {row_name[row_name_num]: ""}})
+
+    def get_para_data(self, week, group, day, para_num):
+        return self.time_table.find_one({'week': week,
+                                         'group': group,
+                                         'day': day,
+                                         'para_num': para_num})
+
+
 
 
 class DataStorage:
@@ -33,7 +86,7 @@ class TotalOwnTimetablesStorage:
         # Create data if doesnt exist
         if user_id not in self.db:
             import utils
-            self.db[user_id] = utils.OwnTimetableStorage(user_id, db.get_users_group(user_id))
+            self.db[user_id] = utils.OwnTimetableStorage(user_id, users_db.get_users_group(user_id))
         return self.db[user_id]
 
 
@@ -61,8 +114,10 @@ class AdminsStorage:
 
 
 tt_storage = TotalOwnTimetablesStorage()
-db = DataStorage()
+users_db = DataStorage()
 add_user_db = set()
 
 admins_db = AdminsStorage()
 add_admins_db = set()
+
+timetable_db = TimeTableData()

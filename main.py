@@ -39,7 +39,7 @@ def add_admin(message):
 
 @bot.message_handler(commands=['today'])
 @utils.logger
-@utils.check_user_exist(database.db)
+@utils.check_user_exist(database.users_db)
 def send_today(message):
     text_timetable = utils.get_actual_timetable(message.chat.id)
     bot.send_message(chat_id=message.chat.id, text=text_timetable)
@@ -101,22 +101,22 @@ def add_group_end(message):
         bot.send_message(chat_id=message.chat.id, text='Такой группы не существует, попробуй ещё раз')
         return
     database.add_user_db.discard(message.chat.id)
-    database.db.add_user(message.chat.id, int(message.text))
+    database.users_db.add_user(message.chat.id, int(message.text))
     database.tt_storage.get_student_tt(message.chat.id).change_actual_group(int(message.text))
     bot.send_message(chat_id=message.chat.id, text='Теперь номер твоей группы {}'.format(int(message.text)))
 
 
 @bot.message_handler(commands=['check'])
 @utils.logger
-@utils.check_user_exist(database.db)
+@utils.check_user_exist(database.users_db)
 def check_user_id(message):
-    group = database.db.get_users_group(message.chat.id)
+    group = database.users_db.get_users_group(message.chat.id)
     bot.send_message(chat_id=message.chat.id, text='Ваша основная группа {}'.format(group))
 
 
 @bot.message_handler(content_types=['text'])
 @utils.logger
-@utils.check_user_exist(database.db)
+@utils.check_user_exist(database.users_db)
 def send_timetable(message):
     user_id = message.chat.id
 
