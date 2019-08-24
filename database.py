@@ -37,7 +37,7 @@ class TimeTableData:
                                                                 'group': actual_group,
                                                                 'day': day,
                                                                 'para_num': para_num},
-                                                               {'$set': {row_name[row_name_num]: row}})
+                                                               {'$set': {row_name[row_name_num]: str(row)}})
                                 else:
                                     self.time_table.update_one({'week': week_num,
                                                                 'group': actual_group,
@@ -50,8 +50,6 @@ class TimeTableData:
                                          'group': group,
                                          'day': day,
                                          'para_num': para_num})
-
-
 
 
 class DataStorage:
@@ -78,18 +76,6 @@ class DataStorage:
             return 0
 
 
-class TotalOwnTimetablesStorage:
-    def __init__(self):
-        self.db = {}
-
-    def get_student_tt(self, user_id):
-        # Create data if doesnt exist
-        if user_id not in self.db:
-            import utils
-            self.db[user_id] = utils.OwnTimetableStorage(user_id, users_db.get_users_group(user_id))
-        return self.db[user_id]
-
-
 class AdminsStorage:
     def __init__(self):
         client = MongoClient(port=27017)
@@ -113,7 +99,6 @@ class AdminsStorage:
             yield admin.get('id')
 
 
-tt_storage = TotalOwnTimetablesStorage()
 users_db = DataStorage()
 add_user_db = set()
 

@@ -6,12 +6,13 @@ from telebot import apihelper, types
 import database
 import tokens
 import utils
+import wrappers
 
 bot = telebot.TeleBot(tokens.token, threaded=False)
 
 
 @bot.message_handler(commands=['admin'])
-@utils.logger
+@wrappers.logger
 def admin_panel(message):
     user_id = message.chat.id
 
@@ -23,7 +24,7 @@ def admin_panel(message):
 
 
 @bot.message_handler(func=lambda message: message.chat.id in database.add_admins_db)
-@utils.logger
+@wrappers.logger
 def add_admin(message):
     user_id = message.chat.id
 
@@ -38,36 +39,38 @@ def add_admin(message):
 
 
 @bot.message_handler(commands=['today'])
-@utils.logger
-@utils.check_user_exist(database.users_db)
+@wrappers.logger
+@wrappers.check_user_exist(database.users_db)
 def send_today(message):
     text_timetable = utils.get_actual_timetable(message.chat.id)
     bot.send_message(chat_id=message.chat.id, text=text_timetable)
 
 
 @bot.message_handler(commands=['info'])
-@utils.logger
+@wrappers.logger
 def send_info(message):
     info_text = """
-Timetable MM bot: v1.1
+Timetable MM bot: v1.2
 Благодарности:
-Кириллу Сапунову за помощь в парсинге расписания,
-Яне Нагорных за подготовку аватара, дизайн и за то, что она лучшая староста в мире:3
+Яне Нагорных за подготовку аватара, дизайн,
 Рамзану Бекбулатову за исправления моего быдлокода,
 Елене Болотиной за тестирование и моральную поддержку
+
+Лучшая благодарность от Вас - звездочка на гитхабе!
+https://github.com/krabchuk/timetable_mm
 
 Отзывы, пожелания по работе бота, баги и несоответствия в расписании присылайте на @krabchuk"""
     bot.send_message(chat_id=message.chat.id, text=info_text)
 
 
 @bot.message_handler(commands=['help'])
-@utils.logger
+@wrappers.logger
 def send_welcome(message):
     bot.send_message(chat_id=message.chat.id, text='Test message')
 
 
 @bot.message_handler(commands=['timetable'])
-@utils.logger
+@wrappers.logger
 def chose_course(message):
     markup = types.ReplyKeyboardMarkup(one_time_keyboard=True)
     btn1 = types.KeyboardButton('Сегодня')
@@ -84,14 +87,14 @@ def chose_course(message):
 
 
 @bot.message_handler(commands=['start'])
-@utils.logger
+@wrappers.logger
 def add_group_begin(message):
     database.add_user_db.add(message.chat.id)
     bot.send_message(chat_id=message.chat.id, text='Отправьте номер группы:')
 
 
 @bot.message_handler(func=lambda message: message.chat.id in database.add_user_db)
-@utils.logger
+@wrappers.logger
 def add_group_end(message):
     if not str(message.text).isdigit():
         bot.send_message(chat_id=message.chat.id, text='Номер группы внезапно является числом, попробуй ещё раз')
@@ -107,16 +110,16 @@ def add_group_end(message):
 
 
 @bot.message_handler(commands=['check'])
-@utils.logger
-@utils.check_user_exist(database.users_db)
+@wrappers.logger
+@wrappers.check_user_exist(database.users_db)
 def check_user_id(message):
     group = database.users_db.get_users_group(message.chat.id)
     bot.send_message(chat_id=message.chat.id, text='Ваша основная группа {}'.format(group))
 
 
 @bot.message_handler(content_types=['text'])
-@utils.logger
-@utils.check_user_exist(database.users_db)
+@wrappers.logger
+@wrappers.check_user_exist(database.users_db)
 def send_timetable(message):
     user_id = message.chat.id
 
