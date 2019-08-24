@@ -17,7 +17,7 @@ def admin_panel(message):
     user_id = message.chat.id
 
     if database.admins_db.exist(user_id):
-        bot.send_message(chat_id=user_id, text='WIP')
+        btn1 = types.KeyboardButton('/admin_change_timetable')
     else:
         database.add_admins_db.add(user_id)
         bot.send_message(chat_id=user_id, text='Send admin\'s password.')
