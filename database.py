@@ -5,10 +5,10 @@ import pandas as pd
 class TimeTableData:
     def __init__(self):
         client = MongoClient(port=27017)
-        db = client.database
-        self.time_table = db.test_timetable
+        self.db = client.database
+        self.time_table = self.db.test_timetable
 
-        load = True
+        load = False
 
         if load:
             branch_offset = [0, 0, 8, 20, 30]
@@ -45,12 +45,25 @@ class TimeTableData:
                                                                 'para_num': para_num},
                                                                {'$set': {row_name[row_name_num]: str(row)}})
 
-
     def get_para_data(self, week, group, day, para_num):
         return self.time_table.find_one({'week': week,
                                          'group': group,
                                          'day': day,
                                          'para_num': para_num})
+
+    def update_timetable(self, user_id, data):
+        if data["admin"]:
+            timetable = self.time_table
+        else:
+            timetable = self.db[str(user_id) + "_time_table"]
+
+        timetable.update_one({'week': data['week'],
+                              'group': users_db.get_users_group(user_id),
+                              'day': data['day'],
+                              'para_num': data['para_num']},
+                             {'$set': {'class': data['class'],
+                                       'teacher': data['teacher'],
+                                       'room': data['room']}})
 
 
 class DataStorage:
@@ -107,3 +120,5 @@ admins_db = AdminsStorage()
 add_admins_db = set()
 
 timetable_db = TimeTableData()
+
+change_timetable_db = dict(dict())

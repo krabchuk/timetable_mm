@@ -1,4 +1,5 @@
 import database
+from telebot import types
 
 
 def group_valid(group):
@@ -29,6 +30,63 @@ def text_to_weekday(text):
     if text.lower() in ['воскресенье', 'вс']:
         return 6
     return None
+
+
+def text_to_week_type(text):
+    if text.lower() in ['верхняя', 'верх']:
+        return 0
+    if text.lower() in ['нижняя', 'низ']:
+        return 1
+    return None
+
+
+def text_to_para_num(text):
+    if text.lower() in ['1', 'первая']:
+        return 0
+    if text.lower() in ['2', 'вторая']:
+        return 1
+    if text.lower() in ['3', 'третья']:
+        return 2
+    if text.lower() in ['4', 'четвертая']:
+        return 3
+    if text.lower() in ['5', 'пятая']:
+        return 4
+    return None
+
+
+def prepare_week_type_markup():
+    markup = types.ReplyKeyboardMarkup(one_time_keyboard=True)
+    btn1 = types.KeyboardButton('Обе')
+    btn2 = types.KeyboardButton('Верхняя')
+    btn3 = types.KeyboardButton('Нижняя')
+    markup.row(btn1)
+    markup.row(btn2, btn3)
+    return markup
+
+
+def prepare_weekday_markup():
+    markup = types.ReplyKeyboardMarkup(one_time_keyboard=True)
+    btn1 = types.KeyboardButton('Понедельник')
+    btn2 = types.KeyboardButton('Вторник')
+    btn3 = types.KeyboardButton('Среда')
+    btn4 = types.KeyboardButton('Четверг')
+    btn5 = types.KeyboardButton('Пятница')
+    btn6 = types.KeyboardButton('Суббота')
+    markup.row(btn1, btn2, btn3)
+    markup.row(btn4, btn5, btn6)
+    return markup
+
+
+def prepare_para_num_markup():
+    markup = types.ReplyKeyboardMarkup(one_time_keyboard=True)
+    btn1 = types.KeyboardButton('Первая')
+    btn2 = types.KeyboardButton('Вторая')
+    btn3 = types.KeyboardButton('Третья')
+    btn4 = types.KeyboardButton('Четвертая')
+    btn5 = types.KeyboardButton('Пятая')
+    markup.row(btn1, btn2)
+    markup.row(btn3, btn4, btn5)
+    return markup
 
 
 def get_actual_timetable(user_id, manual_day=None):
