@@ -12,38 +12,40 @@ class TimeTableData:
 
         if load:
             branch_offset = [0, 0, 8, 20, 30]
-            row_name = ["class", "teacher", "room"]
 
             for week_num, week in enumerate(['up', 'down']):
-                xls_file = pd.ExcelFile("osen_2018_" + week + ".xls")
+                xls_file = pd.ExcelFile("osen_2019_" + week + ".xls")
                 for course in range(1, 7):
                     for branch in range(1, 3 + (course > 2) + 1):
-                        data = xls_file.parse('{}.{}'.format(course, branch))
-                        for group_num, group in enumerate(data.items()):
+                        data_xls = xls_file.parse('{}.{}'.format(course, branch))
+                        data_list = list(data_xls.items())
+                        for group_num in range(1, len(data_list)):
                             actual_group = course * 100 + branch_offset[branch] + group_num
-                            for row_num, row in enumerate(group[1]):
-                                day = row_num // 15
-                                local_row_num = row_num - day * 15
-                                para_num = local_row_num // 3
-                                row_name_num = local_row_num % 3
-                                if row_name_num == 0:
-                                    self.time_table.insert_one({'week': week_num,
-                                                                'group': actual_group,
-                                                                'day': day,
-                                                                'para_num': para_num})
+                            data = data_list[group_num - 1][1]
+                            for row_num in range(6 * 5):  # 6 days x 5 classes
+                                day = row_num // 5
+                                para_num = row_num - day * 5
+                                first_data_row = row_num * 3
+                                first_row = data[first_data_row]
+                                if first_row != first_row:
+                                    self.insert_to_timetable(week_num, actual_group, day, para_num, "", "", "")
+                                    continue
+                                if '\n' in str(first_row):  # parse first row
+                                    parsed_row = str(first_row).split('\n')
+                                    self.insert_to_timetable(week_num, actual_group, day, para_num,
+                                                             parsed_row[0], parsed_row[1], parsed_row[2])
+                                    continue
+                                self.insert_to_timetable(week_num, actual_group, day, para_num,
+                                                         data[first_row], data[first_row + 1], data[first_row + 2])
 
-                                if row != row:
-                                    self.time_table.update_one({'week': week_num,
-                                                                'group': actual_group,
-                                                                'day': day,
-                                                                'para_num': para_num},
-                                                               {'$set': {row_name[row_name_num]: ""}})
-                                else:
-                                    self.time_table.update_one({'week': week_num,
-                                                                'group': actual_group,
-                                                                'day': day,
-                                                                'para_num': para_num},
-                                                               {'$set': {row_name[row_name_num]: str(row)}})
+    def insert_to_timetable(self, week, group, day, para_num, class_name, teacher, room):
+        self.time_table.insert_one({'week': week,
+                                    'group': group,
+                                    'day': day,
+                                    'para_num': para_num,
+                                    'class': class_name,
+                                    'teacher': teacher,
+                                    'room': room})
 
     def get_para_data(self, week, group, day, para_num):
         return self.time_table.find_one({'week': week,
