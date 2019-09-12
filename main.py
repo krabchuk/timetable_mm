@@ -227,7 +227,7 @@ def send_timetable(message):
 
 
 if __name__ == '__main__':
-    debug = True
+    debug = False
 
     if debug:
         #_ = utils.OwnTimetableStorage(0, 101)

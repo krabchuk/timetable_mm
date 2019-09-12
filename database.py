@@ -6,7 +6,7 @@ class TimeTableData:
     def __init__(self):
         client = MongoClient(port=27017)
         self.db = client.database
-        self.time_table = self.db.test_timetable_1109_v3
+        self.time_table = self.db.timetable
 
         self.time_table_debug = {}
 
@@ -62,7 +62,7 @@ class TimeTableData:
                                     'para_num': para_num,
                                     'class': class_name,
                                     'teacher': teacher,
-                                    'room': room})
+                                    'room': str(room).lower()})
 
     def get_para_data(self, week, group, day, para_num):
         return self.time_table.find_one({'week': week,
