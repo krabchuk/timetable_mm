@@ -6,12 +6,14 @@ class TimeTableData:
     def __init__(self):
         client = MongoClient(port=27017)
         self.db = client.database
-        self.time_table = self.db.test_timetable
+        self.time_table = self.db.test_timetable_1109_v3
 
-        load = False
+        self.time_table_debug = {}
+
+        load = True
 
         if load:
-            branch_offset = [0, 0, 8, 20, 30]
+            branch_offset = [0, 0, 6, 20, 30]
 
             for week_num, week in enumerate(['up', 'down']):
                 xls_file = pd.ExcelFile("osen_2019_" + week + ".xls")
@@ -30,13 +32,28 @@ class TimeTableData:
                                 if first_row != first_row:
                                     self.insert_to_timetable(week_num, actual_group, day, para_num, "", "", "")
                                     continue
-                                if '\n' in str(first_row):  # parse first row
+                                if '\n' in str(first_row) and '~' not in str(first_row):  # parse first row
                                     parsed_row = str(first_row).split('\n')
                                     self.insert_to_timetable(week_num, actual_group, day, para_num,
                                                              parsed_row[0], parsed_row[1], parsed_row[2])
                                     continue
+                                if data[first_data_row] != data[first_data_row]:
+                                    class_name = ""
+                                else:
+                                    class_name = data[first_data_row]
+
+                                if data[first_data_row + 1] != data[first_data_row + 1]:
+                                    teacher = ""
+                                else:
+                                    teacher = data[first_data_row + 1]
+
+                                if data[first_data_row + 2] != data[first_data_row + 2]:
+                                    room = ""
+                                else:
+                                    room = data[first_data_row + 2]
+
                                 self.insert_to_timetable(week_num, actual_group, day, para_num,
-                                                         data[first_row], data[first_row + 1], data[first_row + 2])
+                                                         class_name, teacher, room)
 
     def insert_to_timetable(self, week, group, day, para_num, class_name, teacher, room):
         self.time_table.insert_one({'week': week,

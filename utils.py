@@ -108,6 +108,14 @@ def get_actual_timetable(user_id, manual_day=None):
 def get_actual_para_name(user_id, week, group, day, para_num):
     para_data = database.timetable_db.get_para_data(week, group, day, para_num)
 
+    if para_data is None:
+        return '└ 😴🌭🎮'
+
+    if para_data['class'] != para_data['class'] or \
+       para_data['teacher'] != para_data['teacher'] or \
+       para_data['room'] != para_data['room']:
+        return '└ 😴🌭🎮'
+
     if para_data['class'] == 'Физическое воспитание':
         return "└ 🏃 Физическое воспитание"
 
