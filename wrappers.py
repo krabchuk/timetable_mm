@@ -1,4 +1,5 @@
 import functools
+import utils
 
 
 def check_admin_exist(storage):
@@ -34,15 +35,8 @@ def check_user_exist(storage):
     return decorator
 
 
-def get_msk_time():
-    from datetime import datetime
-    from dateutil import tz
-    msk = tz.gettz('UTC+3')
-    return datetime.now(msk)
-
-
 def get_log_filename():
-    now = get_msk_time()
+    now = utils.get_msk_time()
     return '{0}_{1}_{2}_commands_log.txt'.format(str(now.year), str(now.month), str(now.day))
 
 
@@ -54,7 +48,7 @@ def logger(func):
         user_name = message.from_user.username
         group = users_db.get_users_group(message.chat.id)
         with open('./logs/' + get_log_filename(), 'a') as file:
-            print(get_msk_time(), user_id, user_name, group, message.text, file=file)
+            print(utils.get_msk_time(), user_id, user_name, group, message.text, file=file)
         return func(message)
 
     return wrapped

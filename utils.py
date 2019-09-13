@@ -162,3 +162,10 @@ def get_week_and_day():
     if day == 6:
         week = (week + 1) % 2
     return week, day
+
+
+def get_msk_time():
+    from datetime import datetime
+    from dateutil import tz
+    msk = tz.gettz('UTC+3')
+    return datetime.now(msk)

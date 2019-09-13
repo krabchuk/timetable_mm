@@ -237,6 +237,9 @@ if __name__ == '__main__':
         while True:
             try:
                 bot.polling(none_stop=True)
-            except Exception:
-                print('Connection error, restart in 1 sec')
+            except Exception as e:
+                print(e)
+                with open('./logs/' + wrappers.get_log_filename(), 'a') as file:
+                    print(utils.get_msk_time(), 0, 'admin', 0, 'exception', file=file)
+                print('Connection error at {}, restart in 1 sec'.format(utils.get_msk_time()))
                 time.sleep(1)
