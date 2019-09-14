@@ -144,18 +144,7 @@ def send_today(message):
 @bot.message_handler(commands=['info'])
 @wrappers.logger
 def send_info(message):
-    info_text = """
-Timetable MM bot: v1.2
-Благодарности:
-Яне Нагорных за подготовку аватара, дизайн,
-Рамзану Бекбулатову за исправления моего быдлокода,
-Елене Болотиной за тестирование и моральную поддержку
-
-Лучшая благодарность от Вас - звездочка на гитхабе!
-https://github.com/krabchuk/timetable_mm
-
-Отзывы, пожелания по работе бота, баги и несоответствия в расписании присылайте на @krabchuk"""
-    bot.send_message(chat_id=message.chat.id, text=info_text)
+    bot.send_message(chat_id=message.chat.id, text=utils.info_text)
 
 
 @bot.message_handler(commands=['help'])
@@ -185,6 +174,7 @@ def chose_course(message):
 @wrappers.logger
 def add_group_begin(message):
     database.add_user_db.add(message.chat.id)
+    bot.send_message(chat_id=message.chat.id, text=utils.info_text)
     bot.send_message(chat_id=message.chat.id, text='Отправьте номер группы:')
 
 
